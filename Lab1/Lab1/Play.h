@@ -1,7 +1,7 @@
 /* Play.h
 * Author: Elom Kwame Worlanyo
 * E-mail: elomworlanyo@wustl.edu
-* This contains declarations for a Play class, used in Lab 0, 
+* This contains declarations for a Play class, used in Lab 1, 
 * which is concerned with a multithreaded approach to building a play script
 * from a given configuration file. Refer to Readme for more details.
 */
@@ -13,14 +13,31 @@
 #include <vector>
 #include <iostream>
 #include <mutex>
+#include <condition_variable>
 #include <algorithm>
 
+enum numConstants : int
+{
+	ZERO = 0,
+	ONE = 1,
+	TWO = 2,
+};
 
-struct Line{
+enum programErrors : int
+{
+	runningFine = 0,
+	notEnoughArgs = 1,
+	fileNotOpened = 2,
+	noValidCharDef = 3,
+};
+
+struct Line
+{
 	//constructors 
 	Line(){};
 	Line(int num, std::string character, std::string txt)
 		: lineNumber(num), lineCharacter(character), lineText(txt) {};
+	//for comparison
 	bool operator< (const Line &) const;
 	//member variables
 	int lineNumber;
@@ -28,16 +45,20 @@ struct Line{
 	std::string lineText;
 };
 
-class Play{
+class Play
+{
+public:
+	Play(std::string playName) : playName_(playName), counter_(ONE) {};
+	void recite(std::vector<Line>::iterator &lineIt);
+
 private:
 	std::string playName_;
-	std::vector<Line> structuredLines_;
+	std::string speakingCharacter_;
 	std::mutex barrier_;
+	int counter_;
+	std::condition_variable conVar_;
 
-public:
-	Play(std::string playName) : playName_(playName) {};
-	Play &operator<< (Line line);
-	void print(std::ostream &out);
+
 };
 
 #endif
