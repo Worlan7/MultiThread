@@ -14,6 +14,8 @@
 #include <fstream>
 #include <thread>
 
+//Player class models a named character in a play. Each object has its own 
+//thread
 class Player
 {
 public:
@@ -22,7 +24,6 @@ public:
 		charName_(charName),
 		plFile_(plFile)
 	{
-		std::cout << charName_ << std::endl;
 		plThread_ = std::thread();
 	};
 	
@@ -33,7 +34,6 @@ public:
 		charName_(original.charName_),
 		plFile_(original.plFile_)
 	{
-		std::cout << "copy " << original.charName_ << " into " << charName_ << std::endl;
 		plThread_  = std::thread();
 	};
 	//Player methods

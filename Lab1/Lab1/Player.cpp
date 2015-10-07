@@ -13,7 +13,6 @@
 //lines into the Player structured_lines container member variable.
 int Player::read()
 {
-	std::cout << "This is " << charName_ << std::endl;
 	std::string line;
 	if (plFile_.is_open())
 	{
@@ -41,17 +40,18 @@ int Player::read()
 	return runningFine;
 }
 
-
+//Repeatedly passes the iterator into a call to the recite method of the Play 
+//class until the iterator is past the last structured_line in the container.
 void Player::act()
 {
 	std::vector<Line>::iterator lineIt = structuredLines_.begin();
-	while (lineIt != structuredLines_.end())
+	while (lineIt < structuredLines_.end())
 	{
 		play_.recite(lineIt);
 	}
 }
 
-
+//Launches new thread using move semantics. Calls the read, then act methods.
 void Player::enter()
 {
 	std::thread plThread([this]{
@@ -61,7 +61,7 @@ void Player::enter()
 	plThread_ = std::move(plThread);
 }
 
-
+//Calls join method iff thread member variable is joinable
 void Player::exit()
 {
 	if (plThread_.joinable())

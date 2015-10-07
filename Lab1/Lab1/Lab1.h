@@ -12,5 +12,6 @@
 
 #include "Player.h"
 
+const int BASE = 0;
 const int MIN_ARGS = 2;
 #endif

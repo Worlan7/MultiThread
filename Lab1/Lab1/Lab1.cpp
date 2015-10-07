@@ -10,7 +10,10 @@
 #include "stdafx.h"
 #include "Lab1.h"
 
-
+// main function reads in a config file, and based on whether or not it's 
+// formatted correctly, then constructs a Play object using the name of the 
+// play provided, constructs Players for each well defined line in the config
+// file, and causes them to enter and exit the play as desired.
 int main(int argc, char* argv[])
 {
 	if (argc < MIN_ARGS)
@@ -67,7 +70,7 @@ int main(int argc, char* argv[])
 			if (atLeastOneCharacter)
 			{
 				//construct players
-				for (unsigned i = 0; i < charNames.size(); i++)
+				for (unsigned i = BASE; i < charNames.size(); i++)
 				{
 					players.push_back
 					(
