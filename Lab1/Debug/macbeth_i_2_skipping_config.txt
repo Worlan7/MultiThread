@@ -1,0 +1,6 @@
+Macbeth ACT I SCENE II A Camp near Forres by William Shakespeare
+DUNCAN DUNCAN_with_blanks.txt
+MALCOLM MALCOLM_with_blanks.txt
+SOLDIER SOLDIER_with_blanks.txt
+SilentI SilentI.txt
+SilentII SilentII.txt
