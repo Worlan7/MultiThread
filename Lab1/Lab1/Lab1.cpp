@@ -49,17 +49,6 @@ int main(int argc, char* argv[])
 						charFileStream.close();
 						charNames.push_back(charName);
 						charFiles.push_back(std::ifstream(charFile));
-
-						/*players.push_back(
-							std::move(
-								Player
-								(
-									std::ref(mainPlay),
-									std::ref(charName),
-									std::move(std::ifstream(charFile))
-								)
-							)
-						);*/
 						atLeastOneCharacter = true;
 					}
 					else
