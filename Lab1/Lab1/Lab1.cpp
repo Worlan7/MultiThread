@@ -91,6 +91,28 @@ int main(int argc, char* argv[])
 				{
 					p.enter();
 				}
+				//Used to ensure that malformed inputs are handled
+				while (mainPlay.numDone != players.size())
+				{
+					int low = INT_MAX;
+					for (Player& p : players)
+					{
+						if (p.currentLine < low)
+						{
+							low = p.currentLine;
+						}
+					}		
+					if (*mainPlay.counter < low)
+					{
+						 //This means that there is a gap, so we advance the 
+						//counter to the lowest available line
+						std::unique_lock<std::mutex> gapLk(*mainPlay.barrier);
+						*mainPlay.counter = low;
+						gapLk.unlock();
+						mainPlay.conVar.notify_all();
+					}
+				}
+
 				//After enter has been called on all Player objects, call exit
 				for (Player& p : players)
 				{

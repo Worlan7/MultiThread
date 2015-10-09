@@ -47,8 +47,11 @@ void Player::act()
 	std::vector<Line>::iterator lineIt = structuredLines_.begin();
 	while (lineIt < structuredLines_.end())
 	{
+		currentLine = lineIt->lineNumber;
 		play_.recite(lineIt);
 	}
+	currentLine = INT_MAX;	//used to show that current line does not exist.
+	play_.numDone++;		//used to show that player is done.
 }
 
 //Launches new thread using move semantics. Calls the read, then act methods.

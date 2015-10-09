@@ -11,6 +11,7 @@
 #define LAB_1_H
 
 #include "Player.h"
+#include <climits>
 
 const int BASE = 0;
 const int MIN_ARGS = 2;

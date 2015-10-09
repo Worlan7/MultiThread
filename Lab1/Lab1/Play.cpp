@@ -15,6 +15,7 @@ bool Line::operator<(const Line &rLine) const
 	return (lineNumber < rLine.lineNumber);
 }
 
+
 //The recite method compares the value of the counter_ member variable with the
 //line number of the structured_line pointed to by the iterator. If counter_ is
 //less than structured_line's number then this method repeatedly waits on 
@@ -32,12 +33,12 @@ void Play::recite(std::vector<Line>::iterator &lineIt)
 			" Counter > line num" << std::endl;
 		lineIt++;
 		reciteLk.unlock();
-		conVar_.notify_all();
+		conVar.notify_all();
 		return;
 	}
 
 	//wait until counter_ == lineNumber
-	conVar_.wait(reciteLk, [=]{return counter_ == lineIt->lineNumber; });
+	conVar.wait(reciteLk, [=]{return counter_ == lineIt->lineNumber; });
 	
 	//Keep track of speaking character, and output specified format when 
 	//speaking character changes
@@ -47,11 +48,11 @@ void Play::recite(std::vector<Line>::iterator &lineIt)
 		std::cout << std::endl << speakingCharacter_ << "." << std::endl;
 	}
 	std::cout << lineIt->lineText << std::endl;
-
 	lineIt++, counter_++;
 	reciteLk.unlock();
-	conVar_.notify_all();
-
+	conVar.notify_all();
 }
+
+
 
 

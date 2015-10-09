@@ -31,6 +31,7 @@ enum programErrors : int
 	noValidCharDef = 3,
 };
 
+
 struct Line
 {
 	//constructors 
@@ -48,17 +49,20 @@ struct Line
 class Play
 {
 public:
-	Play(std::string playName) : playName_(playName), counter_(ONE) {};
+	Play(std::string playName) : playName_(playName), counter_(ONE),
+	numDone(ZERO), counter(&counter_), barrier(&barrier_) {};
 	void recite(std::vector<Line>::iterator &lineIt);
+	int* counter;		//exposed to main thread
+	std::mutex* barrier;	//exposed to main thread
+	std::condition_variable conVar;		//exposed to main thread
+	int numDone;
+
 
 private:
 	std::string playName_;
 	std::string speakingCharacter_;
 	std::mutex barrier_;
 	int counter_;
-	std::condition_variable conVar_;
-
-
 };
 
 #endif

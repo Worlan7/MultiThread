@@ -73,15 +73,17 @@ when the script fragments purported to have 2 lines at the same line in the
 play. Assuming all lines in the sequence between the first line and the last 
 line of the play were represented, then as per the directions, we noted this 
 issue and output a warning in cerr. I.e. if lines 1,2,2,3 were given, we'd note
-this and the program would continue as expected. If, however, lines 1,2,2,4 were
-given, the counter would wait forever since it would never be incremented past
-3, seeing as line 3 is not present in the script fragments. Indeed, in any 
-script fragment which had a malformed line with a line number such that there 
-was a gap between line numbers, the program ended up waiting indefinitely. For
-example if a line number given was greater than the total number of lines
-present. This seemed to be beyond the scope of the lab and as such was not 
-addressed. Sharing information between Players, however, would probably be the 
-best method to fix this issue.
+this and the program would continue as expected. Initially, however, lines 
+1,2,2,4 were given, the counter would wait forever since it would never be 
+incremented past 3, seeing as line 3 is not present in the script fragments. 
+Indeed, in any script fragment which had a malformed line with a line number 
+such that there was a gap between line numbers, the program ended up waiting 
+indefinitely. For example if a line number given was greater than the total
+number of lines present. This was eventually fixed by using the main thread
+as a synchronization point. The main thread detects when no 
+thread has the line number that is next (which is encoded with a simple counter,
+and the main thread can then just advance the counter to the lowest number that 
+any thread has and notify to wake up the appropriate thread(s).
 
 
 

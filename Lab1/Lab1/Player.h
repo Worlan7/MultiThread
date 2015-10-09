@@ -41,6 +41,8 @@ public:
 	void act();
 	void enter();
 	void exit();
+	//mem vars
+	int currentLine;
 
 private:
 	std::vector<Line> structuredLines_;
