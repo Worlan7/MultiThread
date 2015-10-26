@@ -1,6 +1,10 @@
 /* Lab1.cpp
 * Author: Elom Kwame Worlanyo
 * E-mail: elomworlanyo@wustl.edu
+*
+* Author: Joe Fiala
+* E-mail: joeafiala@wustl.edu
+*
 * This contains the main functions used in Lab 1, which is concerned with
 * a multithreaded approach to building a play script from a given
 * configuration file. Refer to Readme for more details.
