@@ -1,11 +1,7 @@
 /* Player.cpp
 * Author: Elom Kwame Worlanyo
 * E-mail: elomworlanyo@wustl.edu
-*
-* Author: Joe Fiala
-* E-mail: joeafiala@wustl.edu
-*
-* This contains definitions for a Player class used in Lab 1, which is
+* This contains definitions for a Player class used in Lab 2, which is
 * concerned with a multithreaded approach to building a play script
 * from a given configuration file. Refer to Readme for more details.
 */
@@ -15,21 +11,12 @@
 
 //Simple function that repeatedly reads a line from the file, and inserts valid
 //lines into the Player structured_lines container member variable.
-int Player::read(std::string fileName)
+int Player::read()
 {
-	structuredLines_.clear();
-
-	if (!utility::doesFileExist(fileName))
-	{
-		return fileNotOpened;		
-	}
-
-	std::ifstream ifs(fileName);
-
 	std::string line;
-	if (ifs.is_open())
+	if (plFile_.is_open())
 	{
-		while (std::getline(ifs, line))
+		while (std::getline(plFile_, line))
 		{
 			std::istringstream iss(line);
 			int lineNum;
@@ -49,35 +36,30 @@ int Player::read(std::string fileName)
 	}
 	//reorder container by line number
 	std::sort(structuredLines_.begin(), structuredLines_.end());
-	ifs.close();
+	plFile_.close();
 	return runningFine;
 }
 
 //Repeatedly passes the iterator into a call to the recite method of the Play 
 //class until the iterator is past the last structured_line in the container.
-void Player::act(int fragmentNum)
+void Player::act()
 {
-	play_.enter(fragmentNum);
-
-	for (auto it = structuredLines_.begin();; it != structuredLines_.end(); it++)
+	std::vector<Line>::iterator lineIt = structuredLines_.begin();
+	while (lineIt < structuredLines_.end())
 	{
-		play_.recite(it, fragmentNum);
+		currentLine = lineIt->lineNumber;
+		play_.recite(lineIt);
 	}
-
-	play_.exit();
-
-	//QUESTION: are these needed?
-	//currentLine = INT_MAX;	//used to show that current line does not exist.
-	//play_.numDone++;		//used to show that player is done.
+	currentLine = INT_MAX;	//used to show that current line does not exist.
+	play_.numDone++;		//used to show that player is done.
 }
 
 //Launches new thread using move semantics. Calls the read, then act methods.
-void Player::enter(Object obj) //has to have some object here like one of the structs in the writeup
+void Player::enter()
 {
-	charName_ = obj.name;
 	std::thread plThread([this]{
-		this->read(obj.fileName);
-		this->act(obj.fragmentNum);
+		this->read();
+		this->act();
 	});
 	plThread_ = std::move(plThread);
 }
