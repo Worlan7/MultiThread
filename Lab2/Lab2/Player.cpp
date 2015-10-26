@@ -59,7 +59,7 @@ void Player::act(int fragmentNum)
 {
 	play_.enter(fragmentNum);
 
-	for (auto it = structuredLines_.begin();; it != structuredLines_.end(); it++)
+	for (auto it = structuredLines_.begin(); it != structuredLines_.end(); it++)
 	{
 		play_.recite(it, fragmentNum);
 	}
@@ -72,21 +72,39 @@ void Player::act(int fragmentNum)
 }
 
 //Launches new thread using move semantics. Calls the read, then act methods.
-void Player::enter(Object obj) //has to have some object here like one of the structs in the writeup
+void Player::enter()
 {
-	charName_ = obj.name;
+	std::unique_lock<std::mutex> lock(pMutex_);
+
+	while (isBusy_)
+	{
+		pCV_.wait(lock);
+	}
+
+	isBusy_ = true;
+
 	std::thread plThread([this]{
-		this->read(obj.fileName);
-		this->act(obj.fragmentNum);
+		this->read(charFileName_);
+		this->act(fragmentNum_);
+		this->exit();
 	});
 	plThread_ = std::move(plThread);
+
+	plThread_.join();
+
+	lock.unlock();
+	pCV_.notify_all();
 }
 
 //Calls join method iff thread member variable is joinable
 void Player::exit()
 {
-	if (plThread_.joinable())
-	{
-		plThread_.join();
-	}
+	play_.exit; //are we done with this here?
+	isBusy_ = false;
+	pCV_.notify_all();
+}
+
+void doIt()
+{
+
 }

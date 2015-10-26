@@ -25,9 +25,11 @@
 class Player
 {
 public:
-	Player(Play &play) : play_(play), charName_("") //should we just set the default here to ""?
+	Player(Play &play) : play_(play)
 	{
 		plThread_ = std::thread();
+		isBusy_ = false;
+		isActivePlayer_ = true;
 	};
 
 	//Overload default copy constructor, since it would attempt to copy
@@ -43,6 +45,14 @@ public:
 	void act(int fragmentNum);
 	void enter();
 	void exit();
+
+	//maybe the director can call this to add the info that we need for the player tasks?
+	void addInfo(const std::string fileName, const int fragNum)
+	{
+		charFileName_ = fileName;
+		fragmentNum_ = fragNum;
+	};
+
 	//mem vars
 	int currentLine;
 
@@ -50,8 +60,14 @@ private:
 	std::vector<Line> structuredLines_;
 	Play& play_;
 	std::thread plThread_;
-	const std::string& charName_;
+	const std::string charName_;
+	std::string charFileName_;
+	int fragmentNum_;
 
+	//used for performing the tasks
+	std::mutex pMutex_;
+	std::condition_variable pCV_;
+	bool isBusy_;
 };
 
 #endif
