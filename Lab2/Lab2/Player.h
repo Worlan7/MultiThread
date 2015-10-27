@@ -43,7 +43,7 @@ public:
 	//Player methods
 	int read(std::string fileName);
 	void act(int fragmentNum);
-	void enter();
+	void enter(somequeue?);
 	void exit();
 
 	//maybe the director can call this to add the info that we need for the player tasks?

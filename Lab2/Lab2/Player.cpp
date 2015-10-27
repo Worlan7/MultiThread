@@ -72,7 +72,7 @@ void Player::act(int fragmentNum)
 }
 
 //Launches new thread using move semantics. Calls the read, then act methods.
-void Player::enter()
+void Player::enter(somequeue?)
 {
 	std::unique_lock<std::mutex> lock(pMutex_);
 
