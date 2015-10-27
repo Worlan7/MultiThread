@@ -1,4 +1,6 @@
+#include "stdafx.h"
 #include "Director.h"
+#include "Utility.h"
 
 #define START_POSITION 0
 #define STRINGS_EQUAL 0
@@ -83,7 +85,7 @@ Director::Director(string nameOfScriptFile, unsigned int playersToConstruct = 0)
     
     for (int i = 0; i < numPlayers; i++)
     {
-        shared_ptr<Plyer> player(new Plyer(playSharedPointer));
+        shared_ptr<Player> player(new Player(playSharedPointer));
         playerContainer.push_back(move(player));
     }
 }

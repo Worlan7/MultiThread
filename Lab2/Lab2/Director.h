@@ -1,11 +1,12 @@
 #pragma once
-#if ! defined (DIRECTOR_H)
+#ifndef DIRECTOR_H
 #define DIRECTOR_H
 
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <memory>
 #include "Play.h"
 #include "Player.h"
 
@@ -16,8 +17,8 @@ public:
     ~Director();
     void cue();
 private:
-    shared_ptr<Play> playSharedPointer;
-    vector<shared_ptr<Player>> playerContainer;
+    std::shared_ptr<Play> playSharedPointer;
+    vector<std::shared_ptr<Player>> playerContainer;
     //?Script directorScript;
 };
 
