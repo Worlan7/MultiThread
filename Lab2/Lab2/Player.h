@@ -29,7 +29,6 @@ public:
 	{
 		plThread_ = std::thread();
 		isBusy_ = false;
-		isActivePlayer_ = true;
 	};
 
 	//Overload default copy constructor, since it would attempt to copy
