@@ -73,7 +73,8 @@ part::part(std::string name, std::string file)
 			linesOfPart.push_back(tempLine);
 		}
 
-		//setting the iterator to the beginning of the container
-		linesOfPartIterator = linesOfPart.begin();
 	}
+
+	//setting the iterator to the beginning of the container
+	linesOfPartIterator = linesOfPart.begin();
 }
