@@ -2,26 +2,137 @@
 #include "Director.h"
 #include "Utility.h"
 
-#define START_POSITION 0
-#define STRINGS_EQUAL 0
-#define FIRST_OF_CONSECUTIVE 0
-#define SECOND_OF_CONSECUTIVE 0
 
-using namespace std;
-
-class directorException : public exception
+Director::Director(std::string scriptFile, unsigned int minPlayers = 0)
 {
-    virtual const char* badScriptFile() const throw()
-    {
-        return "Exception! Script file could not be opened.";
-    }
-} directorException;
+	std::ifstream scriptFileStream(scriptFile);
+	std::string scriptLine;
+	const std::string scenePrefix = "[scene] ";
+	//used to keep track of the number of part config lines in each scene
+	//fragment config file  
+	std::vector<int> numPartConfigLines;
+	//maximum number of part lines in two consecutive script fragments
+	unsigned int maxConsecPartLines = 0;
+	bool lastLineConfig = false;
+	Script mainScript;
 
-Director::Director(string nameOfScriptFile, unsigned int playersToConstruct = 0)
-{
+	if (scriptFileStream.is_open())
+	{
+		//Iterating line by line through the script file stream.
+		while (std::getline(scriptFileStream, scriptLine))
+		{
+			if (scriptLine.empty())
+			{
+				continue;
+			}
+
+			std::istringstream iss(scriptLine);
+			//Test if current script line is prefixed by "[scene] "
+			if (!scriptLine.compare(ZERO, scenePrefix.size(), scenePrefix))
+			{
+				//Then "[scene] " is a prefix and we extract the scene title
+				std::string sceneTitle = scriptLine.substr(scenePrefix.size());
+				sceneTitles.push_back(sceneTitle);
+				//set lastLineConfig flag to false, since this is not a config
+				//file line
+				lastLineConfig = false;
+			}
+			else
+			{
+				//Then "[scene] " is not a prefix and line is config file fpr
+				//screen fragments
+				std::ifstream fragFile(scriptLine);
+				if (fragFile.is_open())
+				{
+					//TODO: What do we do if fragment contains no valid part 
+					//definition lines?
+					std::shared_ptr<Fragment> newFragment(new Fragment);
+					std::string partDefLine;
+					int numPartDefinitions = 0;
+
+					for (int i = 1; std::getline(fragFile, partDefLine); i++)
+					{
+						if (!partDefLine.empty())
+						{
+							std::stringstream iss(partDefLine);
+							std::string characterName;
+							std::string partFileName;
+
+							if (iss >> characterName >> partFileName)
+							{
+								//valid part definition line, so adding to num
+								//of part definition lines
+								numPartDefinitions++;
+								//creating part and adding to fragment
+								std::shared_ptr<Part> newPart(
+									new Part(characterName, partFileName)
+								);
+								//TODO: What if part is not created?
+								newFragment->parts.push_back(
+									move(newPart)
+								);
+							}
+							else
+							{
+								std::cout << "Skipping line " << i << " in " 
+									<< scriptLine << ", malformed character "
+									<< "definition at line" << std::endl;
+							}
+						}
+					}
+					//currently only adding scene fragment to script if it
+					//contains parts
+					if (!newFragment->parts.empty())
+					{
+						mainScript.fragments.push_back(newFragment);
+						//Storing the number of part definitions
+						numPartConfigLines.push_back(numPartDefinitions);
+						//if two consecutive config lines, push back empty 
+						//string
+						if (lastLineConfig)
+						{
+							std::string empty = " ";
+							sceneTitles.push_back(empty);
+						}
+						//set lastLineConfig flag to true, since this is a 
+						//config file line
+						lastLineConfig = true;
+					}
+				}
+			}
+		}
+
+		//maximum sum of the numbers of part configuration lines that appear 
+		//in any two consecutive configuration files
+		for (int i = 0; i < numPartConfigLines.size() - 1; i++)
+		{
+			int sum = numPartConfigLines[i] + numPartConfigLines[i + ONE];
+			if (maxConsecPartLines < sum)
+			{
+				maxConsecPartLines = sum;
+			}
+		}
+
+		std::shared_ptr<Play> temp(new Play(std::ref(sceneTitles)));
+		playSharedPointer = temp;
+		int numPlayers = std::max(minPlayers, maxConsecPartLines);
+
+		for (int i = 0; i < numPlayers; i++)
+		{
+			std::shared_ptr<Player> player(new Player(*playSharedPointer));
+			playerContainer.push_back(std::move(player));
+		}
+	}
+	else
+	{
+		//throw exception
+	}
+
+
+	/*
     if (!utility::doesFileExist(nameOfScriptFile))
     {
-        throw directorException;
+        throw directorException();
     }
     
     ifstream ifs(nameOfScriptFile);
@@ -110,6 +221,7 @@ Director::Director(string nameOfScriptFile, unsigned int playersToConstruct = 0)
         shared_ptr<Player> player(new Player(playSharedPointer));
         playerContainer.push_back(move(player));
     }
+	*/
 }
 
 

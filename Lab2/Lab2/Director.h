@@ -10,11 +10,13 @@
 #include "Play.h"
 #include "Player.h"
 
+
 class Director
 {
 public:
-    Director(std::string nameOfScriptFile, unsigned int playersToConstruct);
+    Director(std::string scriptFile, unsigned int minPlayers = ZERO);
     ~Director();
+	std::vector<std::string> sceneTitles;
     void cue();
 private:
     std::shared_ptr<Play> playSharedPointer;

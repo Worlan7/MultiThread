@@ -14,7 +14,6 @@
 #define PLAYER_H
 
 #include "Play.h"
-#include "Utility.h"
 #include <sstream>
 #include <fstream>
 #include <thread>
@@ -68,6 +67,7 @@ private:
 	std::mutex pMutex_;
 	std::condition_variable pCV_;
 	bool isBusy_;
+	bool isActivePlayer_;
 };
 
 #endif

@@ -1,9 +1,13 @@
 /* Play.cpp
 * Author: Elom Kwame Worlanyo
 * E-mail: elomworlanyo@wustl.edu
+*
+* Author: Joe Fiala
+* E-mail: joeafiala@wustl.edu
+*
 * This contains definitions for a Play class used in Lab 2, which is
-* concerned with a multithreaded approach to building a play script
-* from a given configuration file. Refer to Readme for more details.
+* concerned with a multithreaded approach to building a play 
+* from a given script file. Refer to Readme for more details.
 */
 
 #include "stdafx.h"
@@ -17,16 +21,20 @@ bool Line::operator<(const Line &rLine) const
 
 
 //The recite method compares the value of the counter_ member variable with the
-//line number of the structured_line pointed to by the iterator. If counter_ is
-//less than structured_line's number then this method repeatedly waits on 
-//conVar_ until counter_ reaches that number. When reached, this method prints
+//line number of the structured_line pointed to by the iterator. It also 
+//compares the sceneFragmentCounter_ with the curSceneFragment. While
+//sceneFragmentCounter_ is less than the passed scene fragment number, or is 
+//equal but lineCounter_ < line number in the structured line referenced by 
+//the passed iterator, the recite method repeatedly waits on conVar, until 
+//lineCounter and sceneFragmentCounter_ reach the values given in the the 
+//corresponding passed data. When reached, this method prints
 //out the line to cout, increments the iterator, notifies all other threads
 //waiting on conVar_ and returns.
 void Play::recite(std::vector<Line>::iterator &lineIt, int curSceneFragment)
 {
 	std::unique_lock<std::mutex> reciteLk(barrier_);
-	//To avoid potential deadlocks, make sure counter_ is not > structured_line
-	//number
+	//To avoid potential deadlocks, make sure neither sceneFragmentCounter_ is
+	// > curSceneFragment nor lineCounter_ is > structured_line number
 	if (sceneFragmentCounter_ >= curSceneFragment) 
 	{
 		if (sceneFragmentCounter_ > curSceneFragment || 
@@ -42,7 +50,7 @@ void Play::recite(std::vector<Line>::iterator &lineIt, int curSceneFragment)
 		}
 	}
 
-	//wait until counter_ == lineNumber
+	//wait until we are in current scene and lineCounter_ == lineNumber
 	conVar.wait(reciteLk, [=]{return (lineCounter_ == lineIt->lineNumber)
 		&& (sceneFragmentCounter_ == curSceneFragment); });
 	
@@ -61,64 +69,54 @@ void Play::recite(std::vector<Line>::iterator &lineIt, int curSceneFragment)
 
 void Play::enter(int sceneFragment)
 {
-	try{
-		std::unique_lock<std::mutex> enterLk(barrier_);
-		if (sceneFragment < sceneFragmentCounter_)
-		{
-			//throw an exception
-			throw invalidSceneEnterException();
-		}
-		else if (sceneFragment > sceneFragmentCounter_)
-		{
-			//wait here till sceneFragment == sceneFragmentCounter_
-			conVar.wait(enterLk, [=]{
-				return sceneFragment == sceneFragmentCounter_;
-			});
-		}
-		//Guaranteed that sceneFragment == sceneFragmentCounter_ at this stage
-		onStage_++;
-		enterLk.unlock();
-		conVar.notify_all();
+
+	std::unique_lock<std::mutex> enterLk(barrier_);
+	if (sceneFragment < sceneFragmentCounter_)
+	{
+		//throw an exception
+		throw invalidSceneEnterException();
 		return;
 	}
-	catch (std::exception& e){
-		std::cout << e.what();
-		return;
+	else if (sceneFragment > sceneFragmentCounter_)
+	{
+		//wait here till sceneFragment == sceneFragmentCounter_
+		conVar.wait(enterLk, [=]{
+			return sceneFragment == sceneFragmentCounter_;
+		});
 	}
+	//Guaranteed that sceneFragment == sceneFragmentCounter_ at this stage
+	onStage_++;
+	enterLk.unlock();
+	conVar.notify_all();
+	return;
 }
 
 void Play::exit()
 {
-	try{
-		std::unique_lock<std::mutex> exitLk(barrier_);
+	std::unique_lock<std::mutex> exitLk(barrier_);
 		
-		if (onStage_ < 1){
-			throw invalidOnStageException();
-		}
-		else if (onStage_ > 1)
+	if (onStage_ < 1){
+		throw invalidOnStageException();
+	}
+	else if (onStage_ > 1)
+	{
+		onStage_--;
+		exitLk.unlock();
+	}
+	else
+	{
+		onStage_--;
+		sceneFragmentCounter_++;
+		if (sceneIt_ != sceneNames_.end())
 		{
-			onStage_--;
-			exitLk.unlock();
-		}
-		else
-		{
-			onStage_--;
-			sceneFragmentCounter_++;
-			if (sceneIt_ != sceneNames_.end())
+			if (!sceneIt_->empty())
 			{
-				if (!sceneIt_->empty())
-				{
-					std::cout << *sceneIt_ << std::endl;
-					sceneIt_++;
-					exitLk.unlock();
-					conVar.notify_all();
-				}
+				std::cout << *sceneIt_ << std::endl;
+				sceneIt_++;
+				exitLk.unlock();
+				conVar.notify_all();
 			}
 		}
-	}
-	catch (std::exception& e){
-		std::cout << e.what();
-		return;
 	}
 }
 

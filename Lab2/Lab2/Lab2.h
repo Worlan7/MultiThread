@@ -10,7 +10,7 @@
 #ifndef LAB_2_H
 #define LAB_2_H
 
-#include "Player.h"
+#include "Director.h"
 #include <climits>
 
 const int BASE = 0;
