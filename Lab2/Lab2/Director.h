@@ -7,6 +7,7 @@
 #include <fstream>
 #include <vector>
 #include <memory>
+#include <queue>
 #include "Play.h"
 #include "Player.h"
 
@@ -21,7 +22,7 @@ public:
 private:
     std::shared_ptr<Play> playSharedPointer;
     std::vector<std::shared_ptr<Player>> playerContainer;
-    //?Script directorScript;
+	std::queue<std::shared_ptr<Part>> partQueue;
 };
 
 #endif /* defined DIRECTOR_H */
