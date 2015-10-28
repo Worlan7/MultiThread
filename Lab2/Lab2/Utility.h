@@ -30,11 +30,11 @@ struct part
 struct fragment
 {
 	std::vector<shared_ptr<part>> partContainer;
-	std::vector<shared_ptr<part>>::iterator partContinerIterator;
+	std::vector<shared_ptr<part>>::iterator partContinerIterator = partContainer.begin();
 };
 
 struct script
 {
 	std::vector<shared_ptr<fragment>> fragmentContainer;
-	std::vector<shared_ptr<fragment>>::iterator fragmentContinerIterator;
+	std::vector<shared_ptr<fragment>>::iterator fragmentContinerIterator = fragmentContainer.begin();
 };
