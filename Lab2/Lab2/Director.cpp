@@ -19,7 +19,7 @@ class directorException : public exception
 
 Director::Director(string nameOfScriptFile, unsigned int playersToConstruct = 0)
 {
-    if (!Utility::doesFileExist(nameOfScriptFile))
+    if (!utility::doesFileExist(nameOfScriptFile))
     {
         throw directorException;
     }
@@ -32,8 +32,11 @@ Director::Director(string nameOfScriptFile, unsigned int playersToConstruct = 0)
     numPartConfigLines.push_back(START_POSITION);
     unsigned int bestSum = START_POSITION;
     bool lastLineConfig = false;
-    
+	script mainScript;
+
     //this can be changed to fit the overall design of parsing strings better
+
+	//goes through the main script to find scene fragments
     while (!ifs.eof() && ifs.good())
     {
         getline(ifs, sceneStr); //gets next line
@@ -50,17 +53,22 @@ Director::Director(string nameOfScriptFile, unsigned int playersToConstruct = 0)
         {
             string configStr = sceneStr; //just for naming/ease of understanding
             
-            if (!doesFileExist(configStr)) continue;
+            if (!utility::doesFileExist(configStr)) continue;
             
             ifstream configIfs(configStr); //configuration file
             
             string partDefLine;
             int numPartDefLines = START_POSITION;
+
+			//goes through scene fragment files to find part files
             while (!configIfs.eof() && configIfs.good())
             {
                 getline(configIfs, partDefLine);
                 
                 if (partDefLine.empty()) continue;
+
+				part tempPart;
+
                 numPartDefLines++;
             }
             
@@ -97,5 +105,4 @@ Director::~Director()
 
 void Director::cue()
 {
-    
 }
