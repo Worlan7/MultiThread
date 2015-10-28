@@ -18,7 +18,7 @@ public:
     void cue();
 private:
     std::shared_ptr<Play> playSharedPointer;
-    vector<std::shared_ptr<Player>> playerContainer;
+    std::vector<std::shared_ptr<Player>> playerContainer;
     //?Script directorScript;
 };
 
