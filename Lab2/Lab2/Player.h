@@ -55,6 +55,12 @@ public:
 	//mem vars
 	int currentLine;
 
+	//used to get min/max
+	bool operator< (const Player &p) const
+	{
+		return tasksRemaining < p.tasksRemaining;
+	};
+
 private:
 	std::vector<Line> structuredLines_;
 	Play& play_;
@@ -68,6 +74,9 @@ private:
 	std::condition_variable pCV_;
 	bool isBusy_;
 	bool isActivePlayer_;
+
+	//used to get tasks remaining
+	int tasksRemaining;
 };
 
 #endif

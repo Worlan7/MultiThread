@@ -7,6 +7,7 @@
 #include <fstream>
 #include <vector>
 #include <memory>
+#include <thread>
 #include <queue>
 #include "Play.h"
 #include "Player.h"
@@ -25,6 +26,7 @@ private:
 	std::queue<std::shared_ptr<Part>> partQueue;
 	Script mainScript;
 	void processScriptFile();
+	void handOffWork();
 };
 
 #endif /* defined DIRECTOR_H */

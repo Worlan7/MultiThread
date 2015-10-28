@@ -243,9 +243,43 @@ void Director::processScriptFile()
 			partQueue.push(std::move(p));
 		}
 	}
+
+	//adds the end signal to the queue, since there are no parts remaining in the script
+	std::shared_ptr<Part> theEnd(new Part("ENDOFPARTS", ""));
+	partQueue.push(std::move(theEnd));
+}
+
+void Director::handOffWork()
+{
+	while (true)
+	{
+		//if there is work in the queue
+		if (!partQueue.empty())
+		{
+			//this signals the end of the parts from the script
+			if (partQueue.front()->characterName.compare("ENDOFPARTS") == ZERO) //presumably we'd just add a part with "ENDOFPARTS" somewhere above
+			{
+				partQueue.pop();
+				return;
+			}
+
+
+			//gets the Player with the min # of tasks left and gives them the front of the queue of Parts
+			std::min(playerContainer.begin(), playerContainer.end())->get()->enter(partQueue.front()); 
+			//^^^for above: assuming the Player.enter takes some Part parameter
+			//maybe we should have a separate Player method that simply adds tasks
+			//(rather than lumping that into the enter method)?
+			
+			
+			partQueue.pop();
+		}
+	}
 }
 
 void Director::cue()
 {
-
+	std::thread process(&processScriptFile);
+	std::thread handOff(&handOffWork);
+	process.join();
+	handOff.join();
 }
