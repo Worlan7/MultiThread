@@ -13,6 +13,7 @@
 #include <vector>
 #include <iostream>
 #include <mutex>
+#include <exception>
 #include <condition_variable>
 #include <algorithm>
 
@@ -31,7 +32,6 @@ enum programErrors : int
 	noValidCharDef = 3,
 };
 
-
 struct Line
 {
 	//constructors 
@@ -44,6 +44,22 @@ struct Line
 	int lineNumber;
 	std::string lineCharacter;
 	std::string lineText;
+};
+
+class invalidSceneEnterException : public std::exception{
+public:
+	const char * what() const throw()
+	{
+		return "Invalid Scene Entry Fragment Exception\n";
+	}
+};
+
+class invalidOnStageException : public std::exception{
+public:
+	const char * what() const throw()
+	{
+		return "Invalid Players on Stage Exception\n";
+	}
 };
 
 class Play
@@ -76,7 +92,7 @@ private:
 	std::mutex barrier_;
 	int lineCounter_;
 	int sceneFragmentCounter_;
-	int onStage_
+	int onStage_;
 };
 
 #endif
