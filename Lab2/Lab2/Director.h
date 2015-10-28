@@ -23,6 +23,8 @@ private:
     std::shared_ptr<Play> playSharedPointer;
     std::vector<std::shared_ptr<Player>> playerContainer;
 	std::queue<std::shared_ptr<Part>> partQueue;
+	Script mainScript;
+	void processScriptFile();
 };
 
 #endif /* defined DIRECTOR_H */

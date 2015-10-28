@@ -14,7 +14,6 @@ Director::Director(std::string scriptFile, unsigned int minPlayers = 0)
 	//maximum number of part lines in two consecutive script fragments
 	unsigned int maxConsecPartLines = 0;
 	bool lastLineConfig = false;
-	Script mainScript;
 
 	if (scriptFileStream.is_open())
 	{
@@ -229,6 +228,24 @@ Director::~Director()
 {
 }
 
+void Director::processScriptFile()
+{
+	//traverses Script struct for fragments
+	for (mainScript.fragmentIter; mainScript.fragmentIter != mainScript.fragments.end(); mainScript.fragmentIter++)
+	{
+		std::shared_ptr<Fragment> f(std::move(mainScript.fragmentIter->get()));
+		//traverses Fragment struct for parts
+		for (f->partIter; f->partIter != f->parts.end(); f->partIter++)
+		{
+			std::shared_ptr<Part> p(std::move(f->partIter->get()));
+
+			//adds part to queues
+			partQueue.push(std::move(p));
+		}
+	}
+}
+
 void Director::cue()
 {
+
 }
