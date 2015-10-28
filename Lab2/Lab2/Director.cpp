@@ -39,6 +39,8 @@ Director::Director(string nameOfScriptFile, unsigned int playersToConstruct = 0)
 	//goes through the main script to find scene fragments
     while (!ifs.eof() && ifs.good())
     {
+		shared_ptr<fragment> newFragment(new fragment);
+
         getline(ifs, sceneStr); //gets next line
         
         if (sceneStr.empty()) continue; //no need to do unneccesary work if the line is blank, so skip
@@ -67,7 +69,16 @@ Director::Director(string nameOfScriptFile, unsigned int playersToConstruct = 0)
                 
                 if (partDefLine.empty()) continue;
 
-				part tempPart;
+				std::stringstream iss(partDefLine);
+
+				std::string characterName;
+				std::string partFileName;
+
+				iss >> characterName >> partFileName; //do we need anything here for safety?
+
+				//creating part and adding to fragment
+				shared_ptr<part> newPart(new part(characterName, partFileName));
+				newFragment->partContainer.push_back(move(newPart));
 
                 numPartDefLines++;
             }
@@ -83,6 +94,9 @@ Director::Director(string nameOfScriptFile, unsigned int playersToConstruct = 0)
             
             lastLineConfig = true;
         }
+
+		//adding fragment to script
+		mainScript.fragmentContainer.push_back(move(newFragment));
     }
     
     shared_ptr<Play> temp(new Play(ref(titlesOfScenes)));
