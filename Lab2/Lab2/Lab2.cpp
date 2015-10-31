@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 	{
 		unsigned int minPlayers;
 		//flag to note if user passed in min number of players to use
-		bool minGiven = false;		
+		bool minGiven = false;
 
 		if (argc > MIN_ARGS)
 		{
@@ -53,10 +53,16 @@ int main(int argc, char* argv[])
 		}
 		else
 		{
-			Director playDirector(scriptFile);
-			playDirector.cue();
+			try{
+				Director playDirector(scriptFile);
+				playDirector.cue();
+			}
+			catch (...)
+			{
+				//TODO
+			}
 		}
-	
-	return runningFine;
-}
 
+		return runningFine;
+	}
+}

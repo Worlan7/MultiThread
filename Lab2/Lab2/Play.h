@@ -23,7 +23,7 @@ class Play
 {
 public:
 	Play(std::vector<std::string>& sceneNames) : sceneNames_(sceneNames), 
-		lineCounter_(ONE), numDone(ZERO), lineCounter(&lineCounter_), 
+		lineCounter_(ONE), lineCounter(&lineCounter_), 
 		barrier(&barrier_), sceneFragmentCounter_(ONE), onStage_(ZERO)
 	{
 		sceneIt_ = sceneNames_.begin();
@@ -39,8 +39,6 @@ public:
 	int* lineCounter;		//exposed to main thread
 	std::mutex* barrier;	//exposed to main thread
 	std::condition_variable conVar;		//exposed to main thread
-	int numDone;
-
 
 private:
 	std::vector<std::string>& sceneNames_;

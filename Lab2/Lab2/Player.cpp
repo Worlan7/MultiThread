@@ -13,9 +13,18 @@
 #include "stdafx.h"
 #include "Player.h"
 
+
+void Player::addMessage(Message m)
+{
+	//Pass in the message given by the Director into the thread safe input
+	//queue 
+	inputQueue.push(m);
+}
+
+
 //Simple function that repeatedly reads a line from the file, and inserts valid
 //lines into the Player structured_lines container member variable.
-int Player::read(std::string fileName)
+int Player::read(std:: string charName, std::string fileName)
 {
 	structuredLines_.clear();
 
@@ -33,7 +42,7 @@ int Player::read(std::string fileName)
 			//the remainder of the line into lineText.
 			if ((iss >> lineNum >> std::ws) && std::getline(iss, lineText))
 			{
-				Line structuredLine(lineNum, charName_, lineText);
+				Line structuredLine(lineNum, charName, lineText);
 				structuredLines_.push_back(structuredLine);
 			}
 		}
@@ -50,56 +59,53 @@ int Player::read(std::string fileName)
 
 //Repeatedly passes the iterator into a call to the recite method of the Play 
 //class until the iterator is past the last structured_line in the container.
-void Player::act(int fragmentNum)
+void Player::act()
 {
-	play_.enter(fragmentNum);
-
-	for (auto it = structuredLines_.begin(); it != structuredLines_.end(); it++)
+	while (true)
 	{
-		play_.recite(it, fragmentNum);
+		std::shared_ptr<Message> activeMessage = inputQueue.waitAndPop();
+		if (!activeMessage->endOfPlay)
+		{
+			std::string charName = activeMessage->inputPart.characterName;
+			std::string fileName = activeMessage->inputPart.fileName;
+			if (read(charName, fileName) != runningFine)
+			{
+				//throw exception
+			}
+			else{
+				play_.enter(activeMessage->sceneFragmentNum);
+				std::vector<Line>::iterator lineIt = structuredLines_.begin();
+				while (lineIt != structuredLines_.end())
+				{
+					play_.recite(lineIt, activeMessage->sceneFragmentNum);
+				}
+				//character being played by player leaves scene
+				play_.exit();
+			}
+		}
+		else
+		{
+			//end of play, so player bows out entirely.
+			this->exit();
+		}
 	}
 
-	play_.exit();
-
-	//QUESTION: are these needed?
-	//currentLine = INT_MAX;	//used to show that current line does not exist.
-	//play_.numDone++;		//used to show that player is done.
 }
 
-//Launches new thread using move semantics. Calls the read, then act methods.
-void Player::enter(Message m)
+//Launches new thread using move semantics. Calls the act method.
+void Player::enter()
 {
-	std::unique_lock<std::mutex> lock(pMutex_);
-
-	while (isBusy_)
-	{
-		pCV_.wait(lock);
-	}
-
-	isBusy_ = true;
-
 	std::thread plThread([this]{
-		this->read(charFileName_);
-		this->act(fragmentNum_);
-		this->exit();
+		this->act();
 	});
 	plThread_ = std::move(plThread);
 
-	plThread_.join();
 
-	lock.unlock();
-	pCV_.notify_all();
 }
 
 //Calls join method iff thread member variable is joinable
 void Player::exit()
 {
 	play_.exit(); //are we done with this here?
-	isBusy_ = false;
-	pCV_.notify_all();
-}
-
-void doIt()
-{
-
+	plThread_.join();
 }

@@ -3,7 +3,7 @@
 #include "Utility.h"
 
 
-Director::Director(std::string scriptFile, unsigned int minPlayers = 0)
+Director::Director(std::string scriptFile, unsigned int minPlayers)
 {
 	std::ifstream scriptFileStream(scriptFile);
 	std::string scriptLine;
@@ -103,17 +103,18 @@ Director::Director(std::string scriptFile, unsigned int minPlayers = 0)
 
 		//maximum sum of the numbers of part configuration lines that appear 
 		//in any two consecutive configuration files
-		for (int i = 0; i < numPartConfigLines.size() - 1; i++)
+		for (unsigned int i = 0; i < numPartConfigLines.size() - 1; i++)
 		{
-			int sum = numPartConfigLines[i] + numPartConfigLines[i + ONE];
+			unsigned int sum = numPartConfigLines[i] + 
+				numPartConfigLines[i + ONE];
+
 			if (maxConsecPartLines < sum)
 			{
 				maxConsecPartLines = sum;
 			}
 		}
 
-		std::shared_ptr<Play> temp(new Play(std::ref(sceneTitles)));
-		playSharedPointer = temp;
+		playSharedPointer = std::make_shared<Play>(std::ref(sceneTitles));
 		int numPlayers = std::max(minPlayers, maxConsecPartLines);
 
 		for (int i = 0; i < numPlayers; i++)
@@ -125,6 +126,7 @@ Director::Director(std::string scriptFile, unsigned int minPlayers = 0)
 	else
 	{
 		//throw exception
+		throw directorException();
 	}
 }
 
@@ -150,6 +152,8 @@ void Director::cue()
 //how the play should proceed.
 void Director::traverseScript()
 {
+	//number of currentSceneFragment
+	int sceneFragmentNum = ONE;
 	//Traversing through script's scene fragments
 	while (directorScript.fragmentIter != directorScript.fragments.end())
 	{
@@ -164,13 +168,14 @@ void Director::traverseScript()
 			//Need to test whether passing by val or by reference is ok. 
 			//Part struct doesn't hold a lot, so copying overhead should be
 			//negligible
-			Message playerMessage(false, *part.get());
+			Message playerMessage(false, *part, sceneFragmentNum);
 			directorMessages.push(playerMessage);
 			
 			fragment->partIter++;
 		}
 
 		//could add an end of scene fragment token here for testing if needed.
+		sceneFragmentNum++;
 		directorScript.fragmentIter++; 
 	}
 
@@ -193,18 +198,23 @@ void Director::signalPlayers()
 {
 	for (int i = 0; !directorMessages.empty(); i++)
 	{
-		playerContainer[i % playerContainer.size()]->enter
+		playerContainer[i % playerContainer.size()]->addMessage
 			(
 				directorMessages.front()
 			);
 		directorMessages.pop();
 	}
 
+	for (auto player : playerContainer)
+	{
+		player->enter();
+	}
+
 }
 
 
-//What needs to be done here? Could we let a default destructor be created?
+/*What needs to be done here? Could we let a default destructor be created?
 Director::~Director()
 {
-}
+}*/
 

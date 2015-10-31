@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <queue>
+#include <mutex>
 #include <sstream>
 #include <fstream>
 
@@ -64,13 +66,48 @@ struct Message
 	//Used to pass special messages where no parts are required
 	Message(bool _endOfPlay) : endOfPlay(_endOfPlay){};
 	//Used to transmit messages to Player's active queue
-	Message(bool _endOfPlay, Part _inputPart) : endOfPlay(_endOfPlay),
+	Message(bool _endOfPlay, Part _inputPart, int _sceneFragmentNum) : 
+		endOfPlay(_endOfPlay), sceneFragmentNum(_sceneFragmentNum),
 		inputPart(_inputPart){};
 	
+	//member variables
 	bool endOfPlay;
+	int sceneFragmentNum;
 	Part inputPart;
 };
 
+template<typename T>
+class PlayerQueue
+{
+private:
+	mutable std::mutex mut;
+	std::queue<std::shared_ptr<T>> dataQueue;
+	std::condition_variable dataCond;
+public:
+	PlayerQueue(){}
+	std::shared_ptr<T> waitAndPop()
+	{
+		std::unique_lock<std::mutex> lk(mut);
+		dataCond.wait(lk, [this] {return !dataQueue.empty(); });
+		std::shared_ptr<T> result = dataQueue.front();
+		dataQueue.pop();
+		return result;
+	}
+
+	void push(T newValue)
+	{
+		std::shared_ptr<T> data(std::make_shared<T>(std::move(newValue)));
+		std::lock_guard<std::mutex> lk(mut);
+		dataQueue.push(data);
+		dataCond.notify_one();
+	}
+
+	bool empty() const
+	{
+		std::lock_guard<std::mutex> lk(mut);
+		return dataQueue.empty();
+	}
+};
 
 
 class invalidOnStageException : public std::exception{

@@ -75,6 +75,8 @@ void Play::enter(int sceneFragment)
 	{
 		//throw an exception
 		throw invalidSceneEnterException();
+		enterLk.unlock();
+		conVar.notify_all();
 		return;
 	}
 	else if (sceneFragment > sceneFragmentCounter_)
@@ -95,8 +97,11 @@ void Play::exit()
 {
 	std::unique_lock<std::mutex> exitLk(barrier_);
 		
-	if (onStage_ < 1){
+	if (onStage_ < 1)
+	{
 		throw invalidOnStageException();
+		exitLk.unlock();
+		conVar.notify_all();
 	}
 	else if (onStage_ > 1)
 	{

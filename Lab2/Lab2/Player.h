@@ -18,7 +18,6 @@
 #include <fstream>
 #include <thread>
 #include <string>
-#include <queue>
 
 //Player class models a named character in a play. Each object has its own 
 //thread
@@ -28,40 +27,28 @@ public:
 	Player(Play &play) : play_(play)
 	{
 		plThread_ = std::thread();
-		isBusy_ = false;
-		isActivePlayer_ = true;
 	};
 
 	//Overload default copy constructor, since it would attempt to copy
-	//thread member variable otherwise.
-	Player(const Player & original) :
-		play_(original.play_),
-		charName_(original.charName_)
-		{
+	//thread member variable otherwise. Should the copy constructor just be
+	//=delete?
+	Player(const Player & original) : play_(original.play_)
+	{
 		plThread_ = std::thread();
 	};
 	//Player methods
-	int read(std::string fileName);
-	void act(int fragmentNum);
-	void enter(Message m);
+	int read(std::string charName, std::string fileName);
+	void act();
+	void enter();
+	void addMessage(Message m);
 	void exit();
-	//mem vars
-	int currentLine;
 
 private:
 	std::vector<Line> structuredLines_;
 	Play& play_;
 	std::thread plThread_;
-	const std::string charName_;
-	std::string charFileName_;
-	int fragmentNum_;
-
-	//used for performing the tasks
-	std::mutex pMutex_;
-	std::condition_variable pCV_;
-	//not sure if necessary
-	bool isBusy_;
-	bool isActivePlayer_;
+	//input queue for Active Object player
+	PlayerQueue<Message> inputQueue;
 };
 
 #endif
