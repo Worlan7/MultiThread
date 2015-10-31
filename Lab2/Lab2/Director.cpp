@@ -157,7 +157,6 @@ void Director::traverseScript()
 	//Traversing through script's scene fragments
 	for (auto fragment : directorScript.fragments)
 	{
-		std::cout << sceneFragmentNum << std::endl;
 		for (auto part : fragment->parts)
 		{
 			Message playerMessage(false, *part, sceneFragmentNum);

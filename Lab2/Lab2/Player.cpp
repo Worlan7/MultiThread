@@ -100,12 +100,14 @@ void Player::enter()
 	});
 	plThread_ = std::move(plThread);
 
-
 }
 
 //Calls join method iff thread member variable is joinable
 void Player::exit()
 {
-	play_.exit(); //are we done with this here?
-	plThread_.join();
+	//play_.exit(); //are we done with this here?
+	if (plThread_.joinable())
+	{
+		plThread_.join();
+	}
 }

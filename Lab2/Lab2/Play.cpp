@@ -113,7 +113,7 @@ void Play::exit()
 		conVar.notify_all();
 	}
 	else
-	{
+	{	
 		onStage_--;
 		sceneFragmentCounter_++;
 		lineCounter_ = ONE;
