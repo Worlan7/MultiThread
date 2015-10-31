@@ -19,17 +19,12 @@ int Player::read(std::string fileName)
 {
 	structuredLines_.clear();
 
-	if (!utility::doesFileExist(fileName))
-	{
-		return fileNotOpened;
-	}
-
-	std::ifstream ifs(fileName);
+	std::ifstream partFile(fileName);
 
 	std::string line;
-	if (ifs.is_open())
+	if (partFile.is_open())
 	{
-		while (std::getline(ifs, line))
+		while (std::getline(partFile, line))
 		{
 			std::istringstream iss(line);
 			int lineNum;
@@ -49,7 +44,7 @@ int Player::read(std::string fileName)
 	}
 	//reorder container by line number
 	std::sort(structuredLines_.begin(), structuredLines_.end());
-	ifs.close();
+	partFile.close();
 	return runningFine;
 }
 
@@ -72,7 +67,7 @@ void Player::act(int fragmentNum)
 }
 
 //Launches new thread using move semantics. Calls the read, then act methods.
-void Player::enter()
+void Player::enter(Message m)
 {
 	std::unique_lock<std::mutex> lock(pMutex_);
 
@@ -99,7 +94,7 @@ void Player::enter()
 //Calls join method iff thread member variable is joinable
 void Player::exit()
 {
-	play_.exit; //are we done with this here?
+	play_.exit(); //are we done with this here?
 	isBusy_ = false;
 	pCV_.notify_all();
 }

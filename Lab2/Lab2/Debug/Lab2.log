@@ -1,5 +1,30 @@
-﻿Build started 10/27/2015 10:26:16 PM.
+﻿Build started 10/30/2015 4:32:34 PM.
+     1>Project "C:\Users\Worlan\documents\visual studio 2013\Projects\Lab2\Lab2\Lab2.vcxproj" on node 2 (Rebuild target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yc"stdafx.h" /Fp"Debug\Lab2.pch" /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt stdafx.cpp
+         stdafx.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\Lab2.pch" /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Director.cpp Lab2.cpp Play.cpp Player.cpp Utility.cpp
+         Utility.cpp
+         Player.cpp
+         Play.cpp
+         Lab2.cpp
+     1>c:\users\worlan\documents\visual studio 2013\projects\lab2\lab2\lab2.cpp(63): fatal error C1075: end of file found before the left brace '{' at 'c:\users\worlan\documents\visual studio 2013\projects\lab2\lab2\lab2.cpp(18)' was matched
+         Director.cpp
+     1>c:\users\worlan\documents\visual studio 2013\projects\lab2\lab2\director.cpp(7): error C2572: 'Director::Director' : redefinition of default parameter : parameter 2
+                 c:\users\worlan\documents\visual studio 2013\projects\lab2\lab2\director.h(17) : see declaration of 'Director::Director'
+     1>c:\users\worlan\documents\visual studio 2013\projects\lab2\lab2\director.cpp(106): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\worlan\documents\visual studio 2013\projects\lab2\lab2\director.cpp(109): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\worlan\documents\visual studio 2013\projects\lab2\lab2\director.cpp(137): error C2143: syntax error : missing ';' before 'std::thread'
+     1>c:\users\worlan\documents\visual studio 2013\projects\lab2\lab2\director.cpp(137): error C2761: 'void Director::cue(void)' : member function redeclaration not allowed
+     1>c:\users\worlan\documents\visual studio 2013\projects\lab2\lab2\director.cpp(137): error C3482: 'this' can only be used as a lambda capture within a non-static member function
+     1>c:\users\worlan\documents\visual studio 2013\projects\lab2\lab2\director.cpp(138): error C2355: 'this' : can only be referenced inside non-static member functions or non-static data member initializers
+     1>c:\users\worlan\documents\visual studio 2013\projects\lab2\lab2\director.cpp(138): error C2227: left of '->traverseScript' must point to class/struct/union/generic type
+     1>c:\users\worlan\documents\visual studio 2013\projects\lab2\lab2\director.cpp(139): error C2355: 'this' : can only be referenced inside non-static member functions or non-static data member initializers
+     1>c:\users\worlan\documents\visual studio 2013\projects\lab2\lab2\director.cpp(139): error C2227: left of '->signalPlayers' must point to class/struct/union/generic type
+     1>c:\users\worlan\documents\visual studio 2013\projects\lab2\lab2\director.cpp(140): fatal error C1903: unable to recover from previous error(s); stopping compilation
+         Generating Code...
+     1>Done Building Project "C:\Users\Worlan\documents\visual studio 2013\Projects\Lab2\Lab2\Lab2.vcxproj" (Rebuild target(s)) -- FAILED.
 
-Build succeeded.
+Build FAILED.
 
-Time Elapsed 00:00:00.22
+Time Elapsed 00:00:04.09

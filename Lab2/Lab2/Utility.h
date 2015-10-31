@@ -38,12 +38,12 @@ struct Line
 
 struct Part
 {
-	Part(std::string name, std::string file);
+	Part(){};
+	Part(std::string name, std::string file) : characterName(name),
+		fileName(file){};
 	//member variables
 	std::string characterName;
 	std::string fileName;
-	std::vector<Line> partLines;
-	std::vector<Line>::iterator partLinesIter;
 };
 
 struct Fragment
@@ -58,6 +58,20 @@ struct Script
 	std::vector<std::shared_ptr<Fragment>>::iterator fragmentIter = 
 		fragments.begin();
 };
+
+struct Message
+{
+	//Used to pass special messages where no parts are required
+	Message(bool _endOfPlay) : endOfPlay(_endOfPlay){};
+	//Used to transmit messages to Player's active queue
+	Message(bool _endOfPlay, Part _inputPart) : endOfPlay(_endOfPlay),
+		inputPart(_inputPart){};
+	
+	bool endOfPlay;
+	Part inputPart;
+};
+
+
 
 class invalidOnStageException : public std::exception{
 public:

@@ -18,6 +18,7 @@
 #include <fstream>
 #include <thread>
 #include <string>
+#include <queue>
 
 //Player class models a named character in a play. Each object has its own 
 //thread
@@ -42,16 +43,8 @@ public:
 	//Player methods
 	int read(std::string fileName);
 	void act(int fragmentNum);
-	void enter();
+	void enter(Message m);
 	void exit();
-
-	//maybe the director can call this to add the info that we need for the player tasks?
-	void addInfo(const std::string fileName, const int fragNum)
-	{
-		charFileName_ = fileName;
-		fragmentNum_ = fragNum;
-	};
-
 	//mem vars
 	int currentLine;
 
@@ -66,6 +59,7 @@ private:
 	//used for performing the tasks
 	std::mutex pMutex_;
 	std::condition_variable pCV_;
+	//not sure if necessary
 	bool isBusy_;
 	bool isActivePlayer_;
 };

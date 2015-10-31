@@ -102,6 +102,7 @@ void Play::exit()
 	{
 		onStage_--;
 		exitLk.unlock();
+		conVar.notify_all();
 	}
 	else
 	{

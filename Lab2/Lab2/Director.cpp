@@ -14,7 +14,6 @@ Director::Director(std::string scriptFile, unsigned int minPlayers = 0)
 	//maximum number of part lines in two consecutive script fragments
 	unsigned int maxConsecPartLines = 0;
 	bool lastLineConfig = false;
-	Script mainScript;
 
 	if (scriptFileStream.is_open())
 	{
@@ -46,7 +45,7 @@ Director::Director(std::string scriptFile, unsigned int minPlayers = 0)
 				{
 					//TODO: What do we do if fragment contains no valid part 
 					//definition lines?
-					std::shared_ptr<Fragment> newFragment(new Fragment);
+					std::shared_ptr<Fragment> newFragment(new Fragment());
 					std::string partDefLine;
 					int numPartDefinitions = 0;
 
@@ -84,7 +83,7 @@ Director::Director(std::string scriptFile, unsigned int minPlayers = 0)
 					//contains parts
 					if (!newFragment->parts.empty())
 					{
-						mainScript.fragments.push_back(newFragment);
+						directorScript.fragments.push_back(newFragment);
 						//Storing the number of part definitions
 						numPartConfigLines.push_back(numPartDefinitions);
 						//if two consecutive config lines, push back empty 
@@ -127,108 +126,85 @@ Director::Director(std::string scriptFile, unsigned int minPlayers = 0)
 	{
 		//throw exception
 	}
-
-
-	/*
-    if (!utility::doesFileExist(nameOfScriptFile))
-    {
-        throw directorException();
-    }
-    
-    ifstream ifs(nameOfScriptFile);
-    string sceneStr;
-    const string sceneToken = "[scene]";
-    vector<string> titlesOfScenes;
-    vector<int> numPartConfigLines;
-    numPartConfigLines.push_back(START_POSITION);
-    unsigned int bestSum = START_POSITION;
-    bool lastLineConfig = false;
-	script mainScript;
-
-    //this can be changed to fit the overall design of parsing strings better
-
-	//goes through the main script to find scene fragments
-    while (!ifs.eof() && ifs.good())
-    {
-		shared_ptr<fragment> newFragment(new fragment);
-
-        getline(ifs, sceneStr); //gets next line
-        
-        if (sceneStr.empty()) continue; //no need to do unneccesary work if the line is blank, so skip
-        
-        if (sceneStr.size() > sceneToken.size() && sceneToken.compare(sceneStr.substr(START_POSITION, sceneToken.size())) == STRINGS_EQUAL)
-        {
-            string sceneTitle = sceneStr.substr(sceneToken.size(), sceneStr.size() - sceneToken.size());
-            titlesOfScenes.push_back(sceneTitle);
-            lastLineConfig = false;
-        }
-        else
-        {
-            string configStr = sceneStr; //just for naming/ease of understanding
-            
-            if (!utility::doesFileExist(configStr)) continue;
-            
-            ifstream configIfs(configStr); //configuration file
-            
-            string partDefLine;
-            int numPartDefLines = START_POSITION;
-
-			//goes through scene fragment files to find part files
-            while (!configIfs.eof() && configIfs.good())
-            {
-                getline(configIfs, partDefLine);
-                
-                if (partDefLine.empty()) continue;
-
-				std::stringstream iss(partDefLine);
-
-				std::string characterName;
-				std::string partFileName;
-
-				iss >> characterName >> partFileName; //do we need anything here for safety?
-
-				//creating part and adding to fragment
-				shared_ptr<part> newPart(new part(characterName, partFileName));
-				newFragment->partContainer.push_back(move(newPart));
-
-                numPartDefLines++;
-            }
-            
-            numPartConfigLines.insert(numPartConfigLines.begin(), numPartDefLines);
-            int sumVal = numPartConfigLines[FIRST_OF_CONSECUTIVE] + numPartConfigLines[SECOND_OF_CONSECUTIVE];
-            if (sumVal > bestSum) bestSum = sumVal;
-            
-            if (lastLineConfig)
-            {
-                titlesOfScenes.push_back(""); //push back empty string
-            }
-            
-            lastLineConfig = true;
-        }
-
-		//adding fragment to script
-		mainScript.fragmentContainer.push_back(move(newFragment));
-    }
-    
-    shared_ptr<Play> temp(new Play(ref(titlesOfScenes)));
-    
-    playSharedPointer = temp;
-    
-    int numPlayers = max(playersToConstruct, bestSum);
-    
-    for (int i = 0; i < numPlayers; i++)
-    {
-        shared_ptr<Player> player(new Player(playSharedPointer));
-        playerContainer.push_back(move(player));
-    }
-	*/
-}
-
-
-Director::~Director()
-{
 }
 
 void Director::cue()
 {
+	//thread that traverses the script data structure, and as it reaches each 
+	//scene fragment, takes each part definition line, recruits an available 
+	//Player from its container, and calls the Player's enter method to hand 
+	//off the information
+	std::thread cueThread([this]{
+		this->traverseScript();
+		this->signalPlayers();
+	});
+
+	if (cueThread.joinable())
+	{
+		cueThread.join();
+	}
 }
+
+//After this method runs, the director should have a list of messages stored in
+//its directorMessages member variable that more or less describe/coordinate
+//how the play should proceed.
+void Director::traverseScript()
+{
+	//Traversing through script's scene fragments
+	while (directorScript.fragmentIter != directorScript.fragments.end())
+	{
+		//Does it make sense to relinquish the Script struct's ownership of
+		//the shared_ptr here instead of simply making a copy?
+		std::shared_ptr<Fragment> fragment(directorScript.fragmentIter->get());
+
+		//Traversing through scene fragment's parts
+		while (fragment->partIter != fragment->parts.end())
+		{
+			std::shared_ptr<Part> part(fragment->partIter->get());
+			//Need to test whether passing by val or by reference is ok. 
+			//Part struct doesn't hold a lot, so copying overhead should be
+			//negligible
+			Message playerMessage(false, *part.get());
+			directorMessages.push(playerMessage);
+			
+			fragment->partIter++;
+		}
+
+		//could add an end of scene fragment token here for testing if needed.
+		directorScript.fragmentIter++; 
+	}
+
+	//Passing in special ACT to signify end of play for all players
+	for (auto player : playerContainer)
+	{
+		Message terminate(true);
+		directorMessages.push(terminate);
+	}
+}
+
+
+//Since we are guaranteed that the number of available players will always be 
+//greater than or equal to the maximum number of needed players in two 
+//consecutive scenes, we can pass off work to all players in a round-robin
+//manner, to ensure even distribution of work to each player's work queue. We
+//are also assured that no player ever has to represent more than one character
+//within the same fragment.
+void Director::signalPlayers()
+{
+	for (int i = 0; !directorMessages.empty(); i++)
+	{
+		playerContainer[i % playerContainer.size()]->enter
+			(
+				directorMessages.front()
+			);
+		directorMessages.pop();
+	}
+
+}
+
+
+//What needs to be done here? Could we let a default destructor be created?
+Director::~Director()
+{
+}
+

@@ -39,17 +39,22 @@ int main(int argc, char* argv[])
 			{
 				std::cout << "Wrong arg passed in for min number of players"
 					<< std::endl;
+				//should we exit the program here or just ignore the fact that 
+				//a wrong argument was provided for minPlayers?
 				return wrongArgs;
 			}
 		}
 
-		Director playDirector;
+		std::string scriptFile = argv[ONE];
 		if (minGiven)
 		{
-
+			Director playDirector(scriptFile, minPlayers);
+			playDirector.cue();
 		}
 		else
 		{
+			Director playDirector(scriptFile);
+			playDirector.cue();
 		}
 	
 	return runningFine;
