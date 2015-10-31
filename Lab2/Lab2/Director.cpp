@@ -155,32 +155,16 @@ void Director::traverseScript()
 	//number of currentSceneFragment
 	int sceneFragmentNum = ONE;
 	//Traversing through script's scene fragments
-	std::cout << "before script" << std::endl;
-	while (directorScript.fragmentIter != directorScript.fragments.end())
+	for (auto fragment : directorScript.fragments)
 	{
-		std::cout << "after script" << std::endl;
-		//Does it make sense to relinquish the Script struct's ownership of
-		//the shared_ptr here instead of simply making a copy?
-		std::shared_ptr<Fragment> fragment(directorScript.fragmentIter->get());
-
-		//Traversing through scene fragment's parts
-		while (fragment->partIter != fragment->parts.end())
+		std::cout << sceneFragmentNum << std::endl;
+		for (auto part : fragment->parts)
 		{
-			std::shared_ptr<Part> part(fragment->partIter->get());
-			//Need to test whether passing by val or by reference is ok. 
-			//Part struct doesn't hold a lot, so copying overhead should be
-			//negligible
 			Message playerMessage(false, *part, sceneFragmentNum);
 			directorMessages.push(playerMessage);
-			
-			fragment->partIter++;
 		}
-
-		//could add an end of scene fragment token here for testing if needed.
 		sceneFragmentNum++;
-		directorScript.fragmentIter++; 
 	}
-
 	//Passing in special ACT to signify end of play for all players
 	for (auto player : playerContainer)
 	{

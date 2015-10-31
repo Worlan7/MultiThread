@@ -48,8 +48,14 @@ int main(int argc, char* argv[])
 		std::string scriptFile = argv[ONE];
 		if (minGiven)
 		{
-			Director playDirector(scriptFile, minPlayers);
-			playDirector.cue();
+			try{
+				Director playDirector(scriptFile, minPlayers);
+				playDirector.cue();
+			}
+			catch (std::exception& e)
+			{
+				std::cout << e.what() << std::endl;
+			}
 		}
 		else
 		{

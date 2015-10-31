@@ -51,18 +51,11 @@ struct Part
 struct Fragment
 {
 	std::vector<std::shared_ptr<Part>> parts;
-	std::vector<std::shared_ptr<Part>>::iterator partIter = parts.begin();
 };
 
 struct Script
 {
-	Script()
-	{
-		fragments = std::vector<std::shared_ptr<Fragment>>();
-		fragmentIter = fragments.begin(); 
-	};
 	std::vector<std::shared_ptr<Fragment>> fragments;
-	std::vector<std::shared_ptr<Fragment>>::iterator fragmentIter;
 };
 
 struct Message
