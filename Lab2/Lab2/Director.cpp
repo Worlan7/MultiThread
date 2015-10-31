@@ -155,8 +155,10 @@ void Director::traverseScript()
 	//number of currentSceneFragment
 	int sceneFragmentNum = ONE;
 	//Traversing through script's scene fragments
+	std::cout << "before script" << std::endl;
 	while (directorScript.fragmentIter != directorScript.fragments.end())
 	{
+		std::cout << "after script" << std::endl;
 		//Does it make sense to relinquish the Script struct's ownership of
 		//the shared_ptr here instead of simply making a copy?
 		std::shared_ptr<Fragment> fragment(directorScript.fragmentIter->get());

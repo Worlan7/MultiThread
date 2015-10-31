@@ -57,9 +57,10 @@ int main(int argc, char* argv[])
 				Director playDirector(scriptFile);
 				playDirector.cue();
 			}
-			catch (...)
+			catch (std::exception& e)
 			{
 				//TODO
+				std::cout << e.what() << std::endl;
 			}
 		}
 
