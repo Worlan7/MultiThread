@@ -1,6 +1,10 @@
-/* Lab1.cpp
+/* Lab2.cpp
 * Author: Elom Kwame Worlanyo
 * E-mail: elomworlanyo@wustl.edu
+* 
+* Author: Joe Fiala
+* E-mail: joeafiala@wustl.edu
+*
 * This contains the main functions used in Lab 2, which is concerned with
 * a multithreaded approach to building a play script from a given
 * configuration file. Refer to Readme for more details.
@@ -18,7 +22,9 @@ int main(int argc, char* argv[])
 {
 	if (argc < MIN_ARGS)
 	{
-		std::cout << "usage: " << argv[ZERO] << "<script_file_name>"
+		std::cout << "usage: " << argv[ZERO] << "<script_file_name>" 
+			<< "<optional: players_to_construct>"
+			<< "<optional: -override>"
 			<< std::endl;
 		return notEnoughArgs;
 	}
@@ -27,9 +33,18 @@ int main(int argc, char* argv[])
 		unsigned int minPlayers;
 		//flag to note if user passed in min number of players to use
 		bool minGiven = false;
+		bool flag = false;
 
 		if (argc > MIN_ARGS)
 		{
+			if (argc > TWO) //if the override argument was given
+			{
+				if (argv[THREE] == "-override")
+				{
+					flag = true;
+				}
+			}
+
 			std::istringstream iss(argv[TWO]);
 			if (iss >> minPlayers)
 			{
@@ -49,7 +64,7 @@ int main(int argc, char* argv[])
 		if (minGiven)
 		{
 			try{
-				Director playDirector(scriptFile, minPlayers);
+				Director playDirector(scriptFile, flag, minPlayers);
 				playDirector.cue();
 			}
 			catch (std::exception& e)
@@ -60,7 +75,7 @@ int main(int argc, char* argv[])
 		else
 		{
 			try{
-				Director playDirector(scriptFile);
+				Director playDirector(scriptFile, flag);
 				playDirector.cue();
 			}
 			catch (std::exception& e)
