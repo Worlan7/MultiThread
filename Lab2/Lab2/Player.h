@@ -24,7 +24,7 @@
 class Player
 {
 public:
-	Player(Play &play) : play_(play)
+	Player(Play &play) : play_(play), isActive(true)
 	{
 		plThread_ = std::thread();
 	};
@@ -32,7 +32,7 @@ public:
 	//Overload default copy constructor, since it would attempt to copy
 	//thread member variable otherwise. Should the copy constructor just be
 	//=delete?
-	Player(const Player & original) : play_(original.play_)
+	Player(const Player & original) : play_(original.play_), isActive(true)
 	{
 		plThread_ = std::thread();
 	};
@@ -42,6 +42,7 @@ public:
 	void enter();
 	void addMessage(Message m);
 	void exit();
+	bool isActive;
 
 private:
 	std::vector<Line> structuredLines_;

@@ -86,7 +86,8 @@ void Player::act()
 		else
 		{
 			//end of play, so player bows out entirely.
-			this->exit();
+			isActive = false;
+			return;
 		}
 	}
 
@@ -105,9 +106,15 @@ void Player::enter()
 //Calls join method iff thread member variable is joinable
 void Player::exit()
 {
-	//play_.exit(); //are we done with this here?
-	if (plThread_.joinable())
+	try{
+		if (plThread_.joinable())
+		{
+			plThread_.join();
+		}
+	}
+	catch (std::exception& e)
 	{
-		plThread_.join();
+		std::cout << " PROBLEM WAS IN PLAYER ACT" << std::endl;
+		std::cout << e.what() << std::endl;
 	}
 }

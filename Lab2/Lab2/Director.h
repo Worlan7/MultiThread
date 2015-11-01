@@ -28,6 +28,10 @@ private:
 	Script directorScript;
 	void traverseScript();
 	void signalPlayers();
+	bool allSignalled_;
+	std::mutex mut_;
+	std::condition_variable directorCond_;
+
 };
 
 #endif /* defined DIRECTOR_H */

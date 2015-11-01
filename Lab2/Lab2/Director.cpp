@@ -5,6 +5,7 @@
 
 Director::Director(std::string scriptFile, unsigned int minPlayers)
 {
+	allSignalled_ = false;
 	std::ifstream scriptFileStream(scriptFile);
 	std::string scriptLine;
 	const std::string scenePrefix = "[scene] ";
@@ -141,6 +142,37 @@ void Director::cue()
 		this->signalPlayers();
 	});
 
+	//waiting for all players to be signalled, then waiting for all players to
+	//complete before joining.
+	std::unique_lock<std::mutex>lk(mut_);
+	directorCond_.wait(lk, [this] {return allSignalled_; });
+	//now waiting for all players to complete.
+	if (!playerContainer.empty())
+	{
+		/*
+		//NEED TO HANDLE MALFORMED ORDER OF INPUTS HERE
+		directorCond_.wait(lk, [this]
+			{
+				//bool to check if all players are inactive
+				std::cout << "WAAAIIITTINNGGG" << std::endl;
+				return std::none_of
+						(
+							playerContainer.begin(),
+							playerContainer.end(),
+							[](std::shared_ptr<Player>& player)
+								{ 
+									return player->isActive; 
+								}
+						);
+			}
+		);*/
+
+		for (auto player : playerContainer)
+		{
+			player->exit();
+		}
+	}
+
 	if (cueThread.joinable())
 	{
 		cueThread.join();
@@ -194,12 +226,9 @@ void Director::signalPlayers()
 	{
 		player->enter();
 	}
-
+	std::unique_lock<std::mutex>lk(mut_);
+	allSignalled_ = true;
+	lk.unlock();
+	directorCond_.notify_one();
 }
-
-
-/*What needs to be done here? Could we let a default destructor be created?
-Director::~Director()
-{
-}*/
 

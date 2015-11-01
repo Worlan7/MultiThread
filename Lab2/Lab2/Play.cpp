@@ -72,7 +72,6 @@ void Play::recite(std::vector<Line>::iterator &lineIt, int curSceneFragment)
 
 void Play::enter(int sceneFragment)
 {
-
 	std::unique_lock<std::mutex> enterLk(barrier_);
 	if (sceneFragment < sceneFragmentCounter_)
 	{
@@ -113,7 +112,7 @@ void Play::exit()
 		conVar.notify_all();
 	}
 	else
-	{	
+	{
 		onStage_--;
 		sceneFragmentCounter_++;
 		lineCounter_ = ONE;
