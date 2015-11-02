@@ -3,7 +3,7 @@
 #include "Utility.h"
 
 
-Director::Director(std::string scriptFile, unsigned int minPlayers)
+Director::Director(std::string scriptFile, bool flag, unsigned int minPlayers)
 {
 	allSignalled_ = false;
 	std::ifstream scriptFileStream(scriptFile);
@@ -117,6 +117,8 @@ Director::Director(std::string scriptFile, unsigned int minPlayers)
 
 		playSharedPointer_ = std::make_shared<Play>(std::ref(sceneTitles));
 		int numPlayers = std::max(minPlayers, maxConsecPartLines);
+
+		if (flag) numPlayers = minPlayers; //used for override function
 
 		for (int i = 0; i < numPlayers; i++)
 		{
