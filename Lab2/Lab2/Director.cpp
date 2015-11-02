@@ -156,8 +156,8 @@ void Director::cue()
 			int low = INT_MAX;
 			for (auto p : playerContainer_)
 			{
-				if (p->isActive &&
-					(p->currentScene == *playSharedPointer_->sceneFragmentCounter))
+				if ((p->curScene == *playSharedPointer_->sceneFragmentCounter)
+					&& p->isActive)
 				{
 					if (p->currentLine < low)
 					{

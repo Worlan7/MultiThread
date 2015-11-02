@@ -42,7 +42,7 @@ public:
 	void addMessage(Message m);
 	void exit();
 	bool isActive;
-	int currentScene;
+	int curScene;
 	int currentLine;
 
 private:

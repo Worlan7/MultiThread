@@ -65,7 +65,6 @@ int main(int argc, char* argv[])
 			}
 			catch (std::exception& e)
 			{
-				//TODO
 				std::cout << e.what() << std::endl;
 			}
 		}

@@ -43,8 +43,10 @@ void Play::recite(std::vector<Line>::iterator &lineIt, int curSceneFragment)
 			std::cerr << "Badly formed script fragment provided. " <<
 				"lineCounter > line num or sceneFragmentCounter > currentScene" 
 				<< std::endl;
-			std::cout << "line " << lineCounter_ << " scene " << sceneFragmentCounter_ <<  std::endl;
-			std::cout << "passed line " << lineIt->lineNumber << " passed scene " << curSceneFragment << std::endl;
+			std::cerr << "line " << lineCounter_ << " scene " << 
+				sceneFragmentCounter_ <<  std::endl;
+			std::cerr << "passed line " << lineIt->lineNumber << 
+				" passed scene " << curSceneFragment << std::endl;
 
 			lineIt++;
 			reciteLk.unlock();

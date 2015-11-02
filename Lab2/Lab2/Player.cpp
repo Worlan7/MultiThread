@@ -68,7 +68,7 @@ void Player::act()
 		{
 			std::string charName = activeMessage->inputPart.characterName;
 			std::string fileName = activeMessage->inputPart.fileName;
-			currentScene = activeMessage->sceneFragmentNum;
+			curScene = activeMessage->sceneFragmentNum;
 			if (read(charName, fileName) != runningFine)
 			{
 				//throw exception
