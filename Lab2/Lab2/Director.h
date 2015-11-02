@@ -16,7 +16,6 @@ class Director
 {
 public:
     Director(std::string scriptFile, bool flag, unsigned int minPlayers = ZERO);
-    //~Director();
 	std::vector<std::string> sceneTitles;
     void cue();
 

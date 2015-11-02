@@ -116,10 +116,16 @@ Director::Director(std::string scriptFile, bool flag, unsigned int minPlayers)
 		}
 
 		playSharedPointer_ = std::make_shared<Play>(std::ref(sceneTitles));
-		int numPlayers = std::max(minPlayers, maxConsecPartLines);
+		int numPlayers;
 
-		if (flag) numPlayers = minPlayers; //used for override function
-
+		if (flag)
+		{
+			numPlayers = minPlayers; //used for override function
+		}
+		else
+		{
+			numPlayers = std::max(minPlayers, maxConsecPartLines);
+		}
 		for (int i = 0; i < numPlayers; i++)
 		{
 			std::shared_ptr<Player> player(new Player(*playSharedPointer_));

@@ -34,13 +34,14 @@ int main(int argc, char* argv[])
 		unsigned int minPlayers;
 		//flag to note if user passed in min number of players to use
 		bool minGiven = false;
-		bool flag = false; //for override function passed to Director constructor
+		//for override function passed to Director constructor
+		bool flag = false;
 
 		if (argc > MIN_ARGS)
 		{
 			if (argc > THREE) //if override argument given
 			{
-				if (argv[THREE] == "-override")
+				if (argv[THREE] == std::string("-override"))
 				{
 					flag = true;
 				}
