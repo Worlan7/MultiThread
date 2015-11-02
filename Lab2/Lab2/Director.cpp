@@ -1,3 +1,16 @@
+/* Director.cpp
+* Author: Elom Kwame Worlanyo
+* E-mail: elomworlanyo@wustl.edu
+*
+* Author: Joe Fiala
+* E-mail: joeafiala@wustl.edu
+*
+* This contains the Director functions used in Lab 2, which are used
+* to construct the Director object, cue the Players, traverse the script,
+* and signal the Player objects.
+* For more information, pleas consult the Readme.
+*/
+
 #include "stdafx.h"
 #include "Director.h"
 #include "Utility.h"
@@ -13,7 +26,7 @@ Director::Director(std::string scriptFile, bool flag, unsigned int minPlayers)
 	//fragment config file  
 	std::vector<int> numPartConfigLines;
 	//maximum number of part lines in two consecutive script fragments
-	unsigned int maxConsecPartLines = 0;
+	unsigned int maxConsecPartLines = ZERO;
 	bool lastLineConfig = false;
 
 	if (scriptFileStream.is_open())
@@ -48,9 +61,9 @@ Director::Director(std::string scriptFile, bool flag, unsigned int minPlayers)
 					//definition lines?
 					std::shared_ptr<Fragment> newFragment(new Fragment());
 					std::string partDefLine;
-					int numPartDefinitions = 0;
+					int numPartDefinitions = ZERO;
 
-					for (int i = 1; std::getline(fragFile, partDefLine); i++)
+					for (int i = ONE; std::getline(fragFile, partDefLine); i++)
 					{
 						if (!partDefLine.empty())
 						{
@@ -66,15 +79,14 @@ Director::Director(std::string scriptFile, bool flag, unsigned int minPlayers)
 								//creating part and adding to fragment
 								std::shared_ptr<Part> newPart(
 									new Part(characterName, partFileName)
-								);
-								//TODO: What if part is not created?
+									);
 								newFragment->parts.push_back(
 									move(newPart)
-								);
+									);
 							}
 							else
 							{
-								std::cout << "Skipping line " << i << " in " 
+								std::cout << "Skipping line " << i << " in "
 									<< scriptLine << ", malformed character "
 									<< "definition at line" << std::endl;
 							}
@@ -104,9 +116,9 @@ Director::Director(std::string scriptFile, bool flag, unsigned int minPlayers)
 
 		//maximum sum of the numbers of part configuration lines that appear 
 		//in any two consecutive configuration files
-		for (unsigned int i = 0; i < numPartConfigLines.size() - 1; i++)
+		for (unsigned int i = ZERO; i < numPartConfigLines.size() - ONE; i++)
 		{
-			unsigned int sum = numPartConfigLines[i] + 
+			unsigned int sum = numPartConfigLines[i] +
 				numPartConfigLines[i + ONE];
 
 			if (maxConsecPartLines < sum)
@@ -126,7 +138,7 @@ Director::Director(std::string scriptFile, bool flag, unsigned int minPlayers)
 		{
 			numPlayers = std::max(minPlayers, maxConsecPartLines);
 		}
-		for (int i = 0; i < numPlayers; i++)
+		for (int i = ZERO; i < numPlayers; i++)
 		{
 			std::shared_ptr<Player> player(new Player(*playSharedPointer_));
 			playerContainer_.push_back(std::move(player));
@@ -173,7 +185,7 @@ void Director::cue()
 					}
 				}
 			}
-		
+
 			if (*(playSharedPointer_->lineCounter) < low)
 			{
 				//This means that there is a gap, so we advance the 
@@ -230,11 +242,11 @@ void Director::traverseScript()
 //within the same fragment.
 void Director::signalPlayers()
 {
-	for (int i = 0; !directorMessages_.empty(); i++)
+	for (int i = ZERO; !directorMessages_.empty(); i++)
 	{
 		playerContainer_[i % playerContainer_.size()]->addMessage
 			(
-				directorMessages_.front()
+			directorMessages_.front()
 			);
 		directorMessages_.pop();
 	}

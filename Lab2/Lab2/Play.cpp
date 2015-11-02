@@ -6,7 +6,7 @@
 * E-mail: joeafiala@wustl.edu
 *
 * This contains definitions for a Play class used in Lab 2, which is
-* concerned with a multithreaded approach to building a play 
+* concerned with a multithreaded approach to building a play
 * from a given script file. Refer to Readme for more details.
 */
 
@@ -35,17 +35,17 @@ void Play::recite(std::vector<Line>::iterator &lineIt, int curSceneFragment)
 	std::unique_lock<std::mutex> reciteLk(barrier_);
 	//To avoid potential deadlocks, make sure neither sceneFragmentCounter_ is
 	// > curSceneFragment nor lineCounter_ is > structured_line number
-	if (sceneFragmentCounter_ >= curSceneFragment) 
+	if (sceneFragmentCounter_ >= curSceneFragment)
 	{
-		if (sceneFragmentCounter_ > curSceneFragment || 
-			lineCounter_ > lineIt->lineNumber )
+		if (sceneFragmentCounter_ > curSceneFragment ||
+			lineCounter_ > lineIt->lineNumber)
 		{
 			std::cerr << "Badly formed script fragment provided. " <<
-				"lineCounter > line num or sceneFragmentCounter > currentScene" 
+				"lineCounter > line num or sceneFragmentCounter > currentScene"
 				<< std::endl;
-			std::cerr << "line " << lineCounter_ << " scene " << 
-				sceneFragmentCounter_ <<  std::endl;
-			std::cerr << "passed line " << lineIt->lineNumber << 
+			std::cerr << "line " << lineCounter_ << " scene " <<
+				sceneFragmentCounter_ << std::endl;
+			std::cerr << "passed line " << lineIt->lineNumber <<
 				" passed scene " << curSceneFragment << std::endl;
 
 			lineIt++;
@@ -58,7 +58,7 @@ void Play::recite(std::vector<Line>::iterator &lineIt, int curSceneFragment)
 	//wait until we are in current scene and lineCounter_ == lineNumber
 	conVar.wait(reciteLk, [=]{return (lineCounter_ == lineIt->lineNumber)
 		&& (sceneFragmentCounter_ == curSceneFragment); });
-	
+
 	//Keep track of speaking character, and output specified format when 
 	//speaking character changes
 	if (lineIt->lineCharacter != speakingCharacter_)
@@ -100,14 +100,14 @@ void Play::enter(int sceneFragment)
 void Play::exit()
 {
 	std::unique_lock<std::mutex> exitLk(barrier_);
-		
-	if (onStage_ < 1)
+
+	if (onStage_ < ONE)
 	{
 		throw invalidOnStageException();
 		exitLk.unlock();
 		conVar.notify_all();
 	}
-	else if (onStage_ > 1)
+	else if (onStage_ > ONE)
 	{
 		onStage_--;
 		exitLk.unlock();

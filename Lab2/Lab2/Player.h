@@ -5,9 +5,9 @@
 * Author: Joe Fiala
 * E-mail: joeafiala@wustl.edu
 *
-* This contains declarations for a Player class, used in Lab 1,
-* which is concerned with a multithreaded approach to building a play script
-* from a given configuration file. Refer to Readme for more details.
+* This contains declarations for a Player class, used in Lab 2,
+* which is concerned with a multithreaded approach to outputting a play script
+* from a given script file. Refer to Readme for more details.
 */
 
 #ifndef PLAYER_H
@@ -53,4 +53,4 @@ private:
 	PlayerQueue<Message> inputQueue;
 };
 
-#endif
+#endif /* defined PLAYER_H */

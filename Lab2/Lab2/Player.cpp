@@ -5,7 +5,7 @@
 * Author: Joe Fiala
 * E-mail: joeafiala@wustl.edu
 *
-* This contains definitions for a Player class used in Lab 1, which is
+* This contains definitions for a Player class used in Lab 2, which is
 * concerned with a multithreaded approach to building a play script
 * from a given configuration file. Refer to Readme for more details.
 */
@@ -24,7 +24,7 @@ void Player::addMessage(Message m)
 
 //Simple function that repeatedly reads a line from the file, and inserts valid
 //lines into the Player structured_lines container member variable.
-int Player::read(std:: string charName, std::string fileName)
+int Player::read(std::string charName, std::string fileName)
 {
 	structuredLines_.clear();
 
@@ -72,6 +72,7 @@ void Player::act()
 			if (read(charName, fileName) != runningFine)
 			{
 				//throw exception
+				throw readException();
 			}
 			else{
 				play_.enter(activeMessage->sceneFragmentNum);

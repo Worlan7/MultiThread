@@ -7,7 +7,9 @@
 *
 * This contains the main functions used in Lab 2, which is concerned with
 * a multithreaded approach to building a play script from a given
-* configuration file. Refer to Readme for more details.
+* script file (as well as optional arguments regarding the number of Player
+* objects to construct and the option to override defaults).
+* Refer to Readme for more details.
 */
 
 
@@ -22,7 +24,7 @@ int main(int argc, char* argv[])
 {
 	if (argc < MIN_ARGS)
 	{
-		std::cout << "usage: " << argv[ZERO] 
+		std::cout << "usage: " << argv[ZERO]
 			<< "<script_file_name>"
 			<< "<optional: players_to_construct>"
 			<< "<optional: -override>"

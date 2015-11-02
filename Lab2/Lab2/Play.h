@@ -1,9 +1,13 @@
 /* Play.h
 * Author: Elom Kwame Worlanyo
 * E-mail: elomworlanyo@wustl.edu
-* This contains declarations for a Play class, used in Lab 2, 
-* which is concerned with a multithreaded approach to building a play script
-* from a given configuration file. Refer to Readme for more details.
+*
+* Author: Joe Fiala
+* E-mail: joeafiala@wustl.edu
+*
+* This contains declarations for a Play class, used in Lab 2,
+* which is concerned with a multithreaded approach to outputting a play script
+* from a given script file. Refer to Readme for more details.
 */
 
 #ifndef PLAY_H
@@ -22,9 +26,9 @@
 class Play
 {
 public:
-	Play(std::vector<std::string>& sceneNames) : sceneNames_(sceneNames), 
-		lineCounter_(ONE), lineCounter(&lineCounter_), 
-		barrier(&barrier_), sceneFragmentCounter_(ONE), 
+	Play(std::vector<std::string>& sceneNames) : sceneNames_(sceneNames),
+		lineCounter_(ONE), lineCounter(&lineCounter_),
+		barrier(&barrier_), sceneFragmentCounter_(ONE),
 		sceneFragmentCounter(&sceneFragmentCounter_), onStage_(ZERO)
 	{
 		sceneIt_ = sceneNames_.begin();
@@ -52,4 +56,4 @@ private:
 	int onStage_;
 };
 
-#endif
+#endif /* defined PLAY_H */

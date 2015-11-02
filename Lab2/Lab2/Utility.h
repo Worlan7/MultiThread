@@ -1,4 +1,21 @@
+/* Player.h
+* Author: Elom Kwame Worlanyo
+* E-mail: elomworlanyo@wustl.edu
+*
+* Author: Joe Fiala
+* E-mail: joeafiala@wustl.edu
+*
+* This file serves as a resource for use throughout this project,
+* and includes common numbers in enums, our structured line struct,
+* the Part, Fragment, and Script struct mentioned in the instructions,
+* the Message and PlayerQueue classes used throughout the multithreaded
+* approach in the project, as well as common exceptions used.
+* Feel free to consult the Readme for more information.
+*/
+
 #pragma once
+#ifndef UTILITY_H
+#define UTILITY_H
 
 #include <string>
 #include <vector>
@@ -64,10 +81,10 @@ struct Message
 	//Used to pass special messages where no parts are required
 	Message(bool _endOfPlay) : endOfPlay(_endOfPlay){};
 	//Used to transmit messages to Player's active queue
-	Message(bool _endOfPlay, Part _inputPart, int _sceneFragmentNum) : 
+	Message(bool _endOfPlay, Part _inputPart, int _sceneFragmentNum) :
 		endOfPlay(_endOfPlay), sceneFragmentNum(_sceneFragmentNum),
 		inputPart(_inputPart){};
-	
+
 	//member variables
 	bool endOfPlay;
 	int sceneFragmentNum;
@@ -132,4 +149,12 @@ class directorException : public std::exception
 	}
 };
 
+class readException : public std::exception
+{
+	virtual const char* what() const throw()
+	{
+		return "Exception! Problem with the read function.";
+	}
+};
 
+#endif /* defined UTILITY_H */
