@@ -84,7 +84,7 @@ Director::Director(std::string scriptFile, unsigned int minPlayers)
 					//contains parts
 					if (!newFragment->parts.empty())
 					{
-						directorScript.fragments.push_back(newFragment);
+						directorScript_.fragments.push_back(newFragment);
 						//Storing the number of part definitions
 						numPartConfigLines.push_back(numPartDefinitions);
 						//if two consecutive config lines, push back empty 
@@ -115,13 +115,13 @@ Director::Director(std::string scriptFile, unsigned int minPlayers)
 			}
 		}
 
-		playSharedPointer = std::make_shared<Play>(std::ref(sceneTitles));
+		playSharedPointer_ = std::make_shared<Play>(std::ref(sceneTitles));
 		int numPlayers = std::max(minPlayers, maxConsecPartLines);
 
 		for (int i = 0; i < numPlayers; i++)
 		{
-			std::shared_ptr<Player> player(new Player(*playSharedPointer));
-			playerContainer.push_back(std::move(player));
+			std::shared_ptr<Player> player(new Player(*playSharedPointer_));
+			playerContainer_.push_back(std::move(player));
 		}
 	}
 	else
@@ -147,27 +147,36 @@ void Director::cue()
 	std::unique_lock<std::mutex>lk(mut_);
 	directorCond_.wait(lk, [this] {return allSignalled_; });
 	//now waiting for all players to complete.
-	if (!playerContainer.empty())
+	if (!playerContainer_.empty())
 	{
-		/*
-		//NEED TO HANDLE MALFORMED ORDER OF INPUTS HERE
-		directorCond_.wait(lk, [this]
-			{
-				//bool to check if all players are inactive
-				std::cout << "WAAAIIITTINNGGG" << std::endl;
-				return std::none_of
-						(
-							playerContainer.begin(),
-							playerContainer.end(),
-							[](std::shared_ptr<Player>& player)
-								{ 
-									return player->isActive; 
-								}
-						);
-			}
-		);*/
+		while (anyActivePlayers())
+		{
+			std::unique_lock<std::mutex> gapLk(*(playSharedPointer_->barrier));
 
-		for (auto player : playerContainer)
+			int low = INT_MAX;
+			for (auto p : playerContainer_)
+			{
+				if (p->isActive &&
+					(p->currentScene == *playSharedPointer_->sceneFragmentCounter))
+				{
+					if (p->currentLine < low)
+					{
+						low = p->currentLine;
+					}
+				}
+			}
+		
+			if (*(playSharedPointer_->lineCounter) < low)
+			{
+				//This means that there is a gap, so we advance the 
+				//counter to the lowest available line
+				*(playSharedPointer_->lineCounter) = low;
+				gapLk.unlock();
+				playSharedPointer_->conVar.notify_all();
+			}
+		}
+
+		for (auto player : playerContainer_)
 		{
 			player->exit();
 		}
@@ -187,20 +196,20 @@ void Director::traverseScript()
 	//number of currentSceneFragment
 	int sceneFragmentNum = ONE;
 	//Traversing through script's scene fragments
-	for (auto fragment : directorScript.fragments)
+	for (auto fragment : directorScript_.fragments)
 	{
 		for (auto part : fragment->parts)
 		{
 			Message playerMessage(false, *part, sceneFragmentNum);
-			directorMessages.push(playerMessage);
+			directorMessages_.push(playerMessage);
 		}
 		sceneFragmentNum++;
 	}
 	//Passing in special ACT to signify end of play for all players
-	for (auto player : playerContainer)
+	for (auto player : playerContainer_)
 	{
 		Message terminate(true);
-		directorMessages.push(terminate);
+		directorMessages_.push(terminate);
 	}
 }
 
@@ -213,16 +222,16 @@ void Director::traverseScript()
 //within the same fragment.
 void Director::signalPlayers()
 {
-	for (int i = 0; !directorMessages.empty(); i++)
+	for (int i = 0; !directorMessages_.empty(); i++)
 	{
-		playerContainer[i % playerContainer.size()]->addMessage
+		playerContainer_[i % playerContainer_.size()]->addMessage
 			(
-				directorMessages.front()
+				directorMessages_.front()
 			);
-		directorMessages.pop();
+		directorMessages_.pop();
 	}
 
-	for (auto player : playerContainer)
+	for (auto player : playerContainer_)
 	{
 		player->enter();
 	}
@@ -232,3 +241,15 @@ void Director::signalPlayers()
 	directorCond_.notify_one();
 }
 
+
+bool Director::anyActivePlayers()
+{
+	for (auto player : playerContainer_)
+	{
+		if (player->isActive)
+		{
+			return true;
+		}
+	}
+	return false;
+}

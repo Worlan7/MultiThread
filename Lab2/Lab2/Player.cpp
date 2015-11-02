@@ -68,6 +68,7 @@ void Player::act()
 		{
 			std::string charName = activeMessage->inputPart.characterName;
 			std::string fileName = activeMessage->inputPart.fileName;
+			currentScene = activeMessage->sceneFragmentNum;
 			if (read(charName, fileName) != runningFine)
 			{
 				//throw exception
@@ -77,6 +78,7 @@ void Player::act()
 				std::vector<Line>::iterator lineIt = structuredLines_.begin();
 				while (lineIt != structuredLines_.end())
 				{
+					currentLine = lineIt->lineNumber;
 					play_.recite(lineIt, activeMessage->sceneFragmentNum);
 				}
 				//character being played by player leaves scene
@@ -114,7 +116,6 @@ void Player::exit()
 	}
 	catch (std::exception& e)
 	{
-		std::cout << " PROBLEM WAS IN PLAYER ACT" << std::endl;
 		std::cout << e.what() << std::endl;
 	}
 }

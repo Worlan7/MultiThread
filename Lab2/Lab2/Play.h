@@ -24,7 +24,8 @@ class Play
 public:
 	Play(std::vector<std::string>& sceneNames) : sceneNames_(sceneNames), 
 		lineCounter_(ONE), lineCounter(&lineCounter_), 
-		barrier(&barrier_), sceneFragmentCounter_(ONE), onStage_(ZERO)
+		barrier(&barrier_), sceneFragmentCounter_(ONE), 
+		sceneFragmentCounter(&sceneFragmentCounter_), onStage_(ZERO)
 	{
 		sceneIt_ = sceneNames_.begin();
 		if (!sceneNames_.empty())
@@ -36,9 +37,10 @@ public:
 	void recite(std::vector<Line>::iterator &lineIt, int curSceneFragment);
 	void enter(int sceneFragment);
 	void exit();
-	int* lineCounter;		//exposed to main thread
-	std::mutex* barrier;	//exposed to main thread
-	std::condition_variable conVar;		//exposed to main thread
+	int* lineCounter;		//exposed to Director
+	int* sceneFragmentCounter;		//exposed to Director
+	std::mutex* barrier;	//exposed to Director
+	std::condition_variable conVar;		//exposed to Director
 
 private:
 	std::vector<std::string>& sceneNames_;
