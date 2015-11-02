@@ -1,9 +1,15 @@
-/* Lab1.cpp
+/* Lab2.cpp
 * Author: Elom Kwame Worlanyo
 * E-mail: elomworlanyo@wustl.edu
+*
+* Author: Joe Fiala
+* E-mail: joeafiala@wustl.edu
+*
 * This contains the main functions used in Lab 2, which is concerned with
 * a multithreaded approach to building a play script from a given
-* configuration file. Refer to Readme for more details.
+* script file (as well as optional arguments regarding the number of Player
+* objects to construct and the option to override defaults).
+* Refer to Readme for more details.
 */
 
 
@@ -18,122 +24,70 @@ int main(int argc, char* argv[])
 {
 	if (argc < MIN_ARGS)
 	{
-		std::cout << "usage: " << argv[ZERO] << "<configuration_file_name"
+		std::cout << "usage: " << argv[ZERO]
+			<< "<script_file_name>"
+			<< "<optional: players_to_construct>"
+			<< "<optional: -override>"
 			<< std::endl;
 		return notEnoughArgs;
 	}
 	else
 	{
-		std::vector<Player> players;
-		std::vector<std::string> charNames;
-		std::vector<std::ifstream> charFiles;
+		unsigned int minPlayers;
+		//flag to note if user passed in min number of players to use
+		bool minGiven = false;
+		//for override function passed to Director constructor
+		bool flag = false;
 
-		bool atLeastOneCharacter = false;
-		std::ifstream configFile(argv[ONE]);
-		std::string playName;
-		std::string configLine;
-
-		if (configFile.is_open())
+		if (argc > MIN_ARGS)
 		{
-			//get play/play fragment name
-			std::getline(configFile, playName);
-			Play mainPlay(playName);
-			//Player definitions
-			for (int i = 1; std::getline(configFile, configLine); i++)
+			if (argc > THREE) //if override argument given
 			{
-				std::istringstream iss(configLine);
-				std::string charName;
-				std::string charFile;
-				if ((iss >> charName >> charFile))
+				if (argv[THREE] == std::string("-override"))
 				{
-					std::ifstream charFileStream(charFile);
-					if (charFileStream.is_open())
-					{
-						charFileStream.close();
-						charNames.push_back(charName);
-						charFiles.push_back(std::ifstream(charFile));
-						atLeastOneCharacter = true;
-					}
-					else
-					{
-						std::cout << "File " << charFile << " not opened"
-							<< std::endl;
-					}
-				}
-				else
-				{
-					std::cout << "Skipping line " << i << " in " << argv[ONE]
-						<< ", malformed character definition at line"
-						<< std::endl;
+					flag = true;
 				}
 			}
-			if (atLeastOneCharacter)
-			{
-				//construct players
-				for (unsigned i = BASE; i < charNames.size(); i++)
-				{
-					players.push_back
-					(
-						std::move
-						(
-							Player
-							(
-								std::ref(mainPlay), 
-								charNames[i], 
-								charFiles[i]
-							)
-						)
-					);
-				}
-				//After all players have been constructed, call each player's 
-				//enter method.
-				for (Player& p : players)
-				{
-					p.enter();
-				}
-				//Used to ensure that malformed inputs are handled
-				while (mainPlay.numDone != players.size())
-				{
-					int low = INT_MAX;
-					for (Player& p : players)
-					{
-						if (p.currentLine < low)
-						{
-							low = p.currentLine;
-						}
-					}		
-					if (*mainPlay.counter < low)
-					{
-						 //This means that there is a gap, so we advance the 
-						//counter to the lowest available line
-						std::unique_lock<std::mutex> gapLk(*mainPlay.barrier);
-						*mainPlay.counter = low;
-						gapLk.unlock();
-						mainPlay.conVar.notify_all();
-					}
-				}
 
-				//After enter has been called on all Player objects, call exit
-				for (Player& p : players)
-				{
-					p.exit();
-				}
+			std::istringstream iss(argv[TWO]);
+			if (iss >> minPlayers)
+			{
+				minGiven = true;
 			}
 			else
 			{
-				//Configuration file did not contain any valid character 
-				//definition
-				std::cout << "No valid character definitions" << std::endl;
-				return noValidCharDef;
+				std::cout << "Wrong arg passed in for min number of players"
+					<< std::endl;
+				//should we exit the program here or just ignore the fact that 
+				//a wrong argument was provided for minPlayers?
+				return wrongArgs;
+			}
+		}
+
+		std::string scriptFile = argv[ONE];
+		if (minGiven)
+		{
+			try{
+				Director playDirector(scriptFile, flag, minPlayers);
+				playDirector.cue();
+			}
+			catch (std::exception& e)
+			{
+				std::cout << e.what() << std::endl;
 			}
 		}
 		else
 		{
-			std::cout << "File " << argv[ONE] << " not opened" << std::endl;
-			return fileNotOpened;
+			try{
+				Director playDirector(scriptFile, flag);
+				playDirector.cue();
+			}
+			catch (std::exception& e)
+			{
+				std::cout << e.what() << std::endl;
+			}
 		}
-		configFile.close();
-	}
-	return runningFine;
-}
 
+		return runningFine;
+	}
+}

@@ -5,16 +5,15 @@
 * Author: Joe Fiala
 * E-mail: joeafiala@wustl.edu
 *
-* This contains declarations for a Player class, used in Lab 1,
-* which is concerned with a multithreaded approach to building a play script
-* from a given configuration file. Refer to Readme for more details.
+* This contains declarations for a Player class, used in Lab 2,
+* which is concerned with a multithreaded approach to outputting a play script
+* from a given script file. Refer to Readme for more details.
 */
 
 #ifndef PLAYER_H
 #define PLAYER_H
 
 #include "Play.h"
-#include "Utility.h"
 #include <sstream>
 #include <fstream>
 #include <thread>
@@ -25,49 +24,33 @@
 class Player
 {
 public:
-	Player(Play &play) : play_(play)
+	Player(Play &play) : play_(play), isActive(true)
 	{
 		plThread_ = std::thread();
-		isBusy_ = false;
-		isActivePlayer_ = true;
 	};
 
 	//Overload default copy constructor, since it would attempt to copy
-	//thread member variable otherwise.
-	Player(const Player & original) :
-		play_(original.play_),
-		charName_(original.charName_)
-		{
+	//thread member variable otherwise. 
+	Player(const Player & original) : play_(original.play_), isActive(true)
+	{
 		plThread_ = std::thread();
 	};
 	//Player methods
-	int read(std::string fileName);
-	void act(int fragmentNum);
+	int read(std::string charName, std::string fileName);
+	void act();
 	void enter();
+	void addMessage(Message m);
 	void exit();
-
-	//maybe the director can call this to add the info that we need for the player tasks?
-	void addInfo(const std::string fileName, const int fragNum)
-	{
-		charFileName_ = fileName;
-		fragmentNum_ = fragNum;
-	};
-
-	//mem vars
+	bool isActive;
+	int curScene;
 	int currentLine;
 
 private:
 	std::vector<Line> structuredLines_;
 	Play& play_;
 	std::thread plThread_;
-	const std::string charName_;
-	std::string charFileName_;
-	int fragmentNum_;
-
-	//used for performing the tasks
-	std::mutex pMutex_;
-	std::condition_variable pCV_;
-	bool isBusy_;
+	//input queue for Active Object player
+	PlayerQueue<Message> inputQueue;
 };
 
-#endif
+#endif /* defined PLAYER_H */
